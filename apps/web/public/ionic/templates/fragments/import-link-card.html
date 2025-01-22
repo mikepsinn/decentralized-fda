@@ -1,0 +1,40 @@
+<div class="card" 
+     id="import-link-card" 
+     style="background-color: #2E294E; border-radius: 15px">
+    <div id="helpInfoCardHeader" 
+         class="item item-avatar item-borderless"
+         style="background-color: #2E294E; padding-left: 0; padding-right: 0; box-shadow: none;">
+    <span style="position: absolute; top: 15px; left: 15px; font-size: 36px; max-width: 40px; max-height: 40px; width: 100%; border-radius: 4px;">
+        <i class="icon balanced ion-android-download"></i>
+    </span>
+        <span style="text-align: center; height: 40px; line-height: 40px; white-space: nowrap; font-family: 'Open Sans', sans-serif;">
+            <p ng-if="!platform.isMobile" style="font-size: 24px; color: white; ">Import Your Data</p>
+            <p ng-if="platform.isMobile" style="font-size: 18px; color: white; ">Import Your Data</p>
+        </span>
+        <button id="closeButton" 
+                class="button button-clear button-assertive" 
+                ng-click="goBack()"
+                style="position: absolute; top: 10px; right: 10px; font-size: 25px;">
+            <i class="ion-close-round">
+        </i>
+        </button>
+    </div>
+    <div class="item item-body item-borderless" 
+         style="padding-top: 5px; color: white; text-align: center;
+         background-color: #2E294E; max-width: 500px; margin: 0 auto; font-size: 14px; 
+         font-family: 'Open Sans', sans-serif;">
+        To import your data, please click the link below to open the authorization page in a new window.
+    </div>
+    <div class="row" >
+        <div class="button-bar">
+            <button class="button button-clear button-balanced"
+                    style="font-size: 14px;"
+                    id="goToStateButton"
+                    ng-click="state.openInNewTab()">
+                <i class="icon ion-android-open"> &nbsp; Go to Authorization Page
+                    &nbsp;</i>
+            </button>
+        </div>
+    </div>
+    <br>
+</div>

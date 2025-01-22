@@ -1,0 +1,13 @@
+<md-switch ng-model="appSettings.appDesign.cssSettings.futuristicBackground" aria-label="futuristicBackground"
+           ng-change="postAppSettingsAfterConfirmation()">
+    Futuristic Background
+</md-switch>
+<div style="position: relative; display: block; padding-top: 20px;">
+	<div style="z-index: 8; ">
+		<img type="file" ngf-select="uploadAppImage($file, $invalidFiles, 'generic', item, $event)"
+		     ng-src="{{appSettings.appDesign.cssSettings.loaderImage.url}}" style="width: 100px; height: 
+					     100px;">
+	</div>
+</div>
+<div flex="50" label="Bar Color" md-color-picker="" ng-model="appSettings.appDesign.cssSettings.barColor"></div>
+<div flex="50" label="Background Color" md-color-picker="" ng-model="appSettings.appDesign.cssSettings.backgroundColor"></div>

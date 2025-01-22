@@ -1,0 +1,267 @@
+<ion-view hide-nav-bar="hideNavigationMenu">
+    <ion-nav-title>Study</ion-nav-title>
+    <ion-content scroll="{ isBrowserView : platform.isWeb == false }"
+                 overflow-scroll="true"
+                 style="padding: 10px;"
+                 ng-class="{ isBrowserView : platform.isWeb == true }">
+        <ion-refresher on-refresh="refreshStudy()"></ion-refresher>
+	    <md-progress-linear md-mode="indeterminate"  ng-show="loadingCharts || !study"></md-progress-linear>
+        <div ng-show="loadingCharts || !study" style="left: -10px; right: -10px">
+        </div>
+        <div ng-if="study">
+            <md-card id="studyHeaderHtml"
+                     class="card padding">
+                <div id="studyHeaderHtml"
+                     class="item-text-wrap padding"
+                     ng-if="study.studyHtml.studyHeaderHtml"
+                     ng-bind-html="trustAsHtml(study.studyHtml.studyHeaderHtml, true)"
+                     style="text-align: center; padding-top: 10px;">
+                </div>
+            </md-card>
+            <div ng-if="study.statistics && study.statistics.id"
+		            ng-include="'templates/buttons/vote-buttons.html'"></div>
+            <div ng-include="'templates/buttons/study-sharing-buttons.html'"></div>
+            <div
+              class="center"
+              ng-hide="study.studyCharts && user && (study.userId === user.id || study.statistics.userId === user.id)">
+                <md-button id="joinStudyButton"
+                        class="md-primary md-raised"
+                        ng-click="goToJoinStudy(study)">
+                    Join this Study
+                </md-button>
+            </div>
+        </div>
+        <div ng-show="loadingCharts || !study">
+            <div style="max-width: 600px; display:block; margin:auto;"
+                 ng-include="'templates/loaders/blue-robot-loader.html'"></div>
+            <div ng-show="loadingCharts" ng-include="'templates/spinner.html'"></div>
+        </div>
+        <div ng-cloak ng-show="study">
+            <div id="individual-owner-buttons"
+                 ng-if="study.isOwner && study.type === 'individual'">
+                <div class="center padding-top">
+                    <md-button class="md-raised icon-left {{study.studyImages.causeVariableIonIcon}}"
+                            id="causeVariableSettingsButton"
+                            ng-click="goToVariableSettingsForCauseVariable(study.statistics)">
+                        {{study.causeVariableName}} Settings
+                    </md-button>
+                    <md-button class="md-raised icon-left {{study.studyImages.effectVariableIonIcon}}"
+                            id="effectVariableSettingsButton"
+                            ng-click="goToVariableSettingsForEffectVariable(study.statistics)">
+                        {{study.effectVariableName}} Settings
+                    </md-button>
+                </div>
+                <div id="publicStudyToggle"
+                     ng-if="study.studySharing"
+                     class="card">
+                    <ion-toggle ng-model="study.studySharing.shareUserMeasurements"
+                                ng-change="toggleStudyShare(study)">
+                        <i ng-if="!study.studySharing.shareUserMeasurements" class="icon ion-locked">
+                            &nbsp Study is Private
+                        </i>
+                        <i ng-if="study.studySharing.shareUserMeasurements" class="icon ion-unlocked">
+                            &nbsp Study is Public
+                        </i>
+                    </ion-toggle>
+                    <!--TODO: Add clipboard plugin for mobile-->
+<!--                    <md-button ng-click="copyStudyUrlToClipboard()"
+                           ng-if="!platform.isMobile && study.studySharing.shareUserMeasurements === true && study.studyLinks.studyLinkStatic">
+                        <i class="icon ion-clipboard"> &nbsp {{state.copyLinkText}}</i>
+                    </md-button>-->
+                </div>
+            </div>
+            <div id="non-owner-buttons"
+                 ng-if="!state.loading">
+                 ng-if="!study.isOwner || study.type !== 'individual'">
+                <div id="join-button"
+                     class="row">
+                    <div class="col">
+                        <button class="button button-outline button-block icon-left ion-ios-people button-positive"
+                                id="join-study-button"
+                                ng-click="goToJoinStudy(study)">
+                            Join This Study
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-cloak ng-show="study && study.studyCharts">
+            <div id="studyCharts"
+                 style="text-align: center;">
+                <div ng-repeat="(key, chart) in study.studyCharts" ng-if="chart.highchartConfig"
+                     class="item-text-wrap card">
+<!--                    <h2>{{chart.chartTitle}}</h2>-->
+                    <highchart id="{{chart.chartId}}" config="chart.highchartConfig"></highchart>
+<!--                    <p ng-if="chart.explanation">{{chart.explanation}}</p>-->
+<!--                    <br>-->
+                </div>
+            </div>
+            <div id="causeVariableCharts" style="text-align: center;">
+                <div ng-repeat="(key, causeChart) in study.causeVariable.charts"
+                     class="card"
+                     ng-if="causeChart.highchartConfig">
+<!--                    <h2>{{causeChart.chartTitle}}</h2>-->
+                    <highchart id="{{causeChart.chartId}}" config="causeChart.highchartConfig"></highchart>
+<!--                    <p ng-if="causeChart.explanation">{{causeChart.explanation}}</p>-->
+<!--                    <br>-->
+                </div>
+            </div>
+            <div id="effectVariableCharts"
+                 style="text-align: center;">
+                <div ng-repeat="(key, effectChart) in study.effectVariable.charts"
+                     class="card"
+                     ng-if="effectChart.highchartConfig">
+<!--                    <h2>{{effectChart.chartTitle}}</h2>-->
+                    <highchart id="{{effectChart.chartId}}" config="effectChart.highchartConfig"></highchart>
+<!--                    <p ng-if="effectChart.explanation">{{effectChart.explanation}}</p>-->
+<!--                    <br>-->
+                </div>
+            </div>
+            <div id="studyBody" ng-bind-html="trustAsHtml(study.studyHtml.studyTextHtml)"></div>
+        </div>
+        <div ng-show="study.statistics && study.statistics.id">
+	        <div id="statisticsCard" ng-show="study.statistics" class="card variable-settings">
+		        <div class="list">
+			        <div class="item item-divider ng-binding">Quick Statistics</div>
+			        <label ng-show="study.statistics.causeVariableName" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Cause Variable Name</span><br>
+				        <span class="input-label-dark-bg right-text "
+				              id="causeVariableName">{{study.statistics.causeVariableName}}</span>
+			        </label>
+			        <label ng-show="study.statistics.effectVariableName" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Effect Variable Name</span><br>
+				        <span class="input-label-dark-bg right-text "
+				              id="effectVariableName">{{study.statistics.effectVariableName}}</span>
+			        </label>
+			        <label ng-show="study.statistics.correlationCoefficient" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Predictive Correlation Coefficient</span><br>
+				        <span class="input-label-dark-bg right-text " id="correlationCoefficient">{{study.statistics.correlationCoefficient}}</span>
+			        </label>
+			        <label ng-show="study.statistics.averageForwardPearsonCorrelationOverOnsetDelays"
+			               class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Average Forward Correlation Over Delays</span><br>
+				        <span class="input-label-dark-bg right-text " id="averageForwardPearsonCorrelationOverOnsetDelays">
+                {{study.statistics.averageForwardPearsonCorrelationOverOnsetDelays}}
+            </span>
+			        </label>
+			        <label ng-show="study.statistics.averageReversePearsonCorrelationOverOnsetDelays"
+			               class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Average Reverse Correlation Over Delays</span><br>
+				        <span class="input-label-dark-bg right-text " id="averageReversePearsonCorrelationOverOnsetDelays">
+                {{study.statistics.averageReversePearsonCorrelationOverOnsetDelays}}
+            </span>
+			        </label>
+			        <label ng-show="study.statistics.averagePearsonCorrelationCoefficientOverOnsetDelays"
+			               class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Average Correlation Over All Onset Delays</span><br>
+				        <span class="input-label-dark-bg right-text " id="averagePearsonCorrelationCoefficientOverOnsetDelays">
+                {{study.statistics.averagePearsonCorrelationCoefficientOverOnsetDelays}}
+            </span>
+			        </label>
+			        <label ng-show="study.statistics.strongestPearsonCorrelationCoefficient" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Strongest Correlation Over All Onset Delays</span><br>
+				        <span class="input-label-dark-bg right-text " id="strongestPearsonCorrelationCoefficient">
+                {{study.statistics.strongestPearsonCorrelationCoefficient}}
+            </span>
+			        </label>
+			        <!--        <label ng-show="study.statistics.onsetDelayWithStrongestPearsonCorrelation" class="item item-content" style="padding: 6px 10px 5px 16px;">
+								<span class="input-label-dark-bg left-text">Onset Delay With Strongest Correlation</span><br>
+								<span class="input-label-dark-bg right-text " id="onsetDelayWithStrongestPearsonCorrelation">
+									{{study.statistics.onsetDelayWithStrongestPearsonCorrelation}} seconds
+								</span>
+							</label>-->
+			        <label ng-show="study.statistics.qmScore" class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">QuantiModo Score</span><br>
+				        <span class="input-label-dark-bg right-text " id="qmScore">{{study.statistics.qmScore}}</span>
+			        </label>
+			        <label class="item item-content" style="padding: 6px 10px 5px 16px;"
+			               ng-click="changeVariableSetting(study.statistics.causeVariable, 'onsetDelayInHours', $event)">
+				        <span class="input-label-dark-bg left-text">Onset Delay</span><br>
+				        <span class="input-label-dark-bg right-text "
+				              id="onsetDelay">{{study.statistics.onsetDelayInHours}} Hours</span>
+			        </label>
+			        <label ng-show="study.statistics.durationOfAction" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;"
+			               ng-click="changeVariableSetting(study.statistics.causeVariable, 'durationOfActionInHours', $event)">
+				        <span class="input-label-dark-bg left-text">Duration Of Action</span><br>
+				        <span class="right-text" id="durationOfAction">
+                {{study.statistics.durationOfActionInHours}} Hours
+            </span>
+			        </label>
+			        <label ng-show="study.statistics.numberOfPairs" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Number Of Pairs</span><br>
+				        <span class="input-label-dark-bg right-text " id="numberOfPairs">{{study.statistics.numberOfPairs}}</span>
+			        </label>
+			        <label ng-show="study.statistics.causeChanges" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Predictor Value Changes</span><br>
+				        <span class="input-label-dark-bg right-text " id="causeChanges">{{study.statistics.causeChanges}}</span>
+			        </label>
+			        <label ng-show="study.statistics.effectChanges" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Outcome Value Changes</span><br>
+				        <span class="input-label-dark-bg right-text " id="effectChanges">{{study.statistics.effectChanges}}</span>
+			        </label>
+			        <label ng-show="study.statistics.statisticalSignificance" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Statistical Significance</span><br>
+				        <span class="input-label-dark-bg right-text " id="statisticalSignificance">{{study.statistics.statisticalSignificance}}</span>
+			        </label>
+			        <label ng-show="study.statistics.predictsHighEffectChange" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Typical High Outcome Change from Average</span><br>
+				        <span class="input-label-dark-bg right-text " id="predictsHighEffectChange">{{study.statistics.predictsHighEffectChange}}%</span>
+			        </label>
+			        <label ng-show="study.statistics.predictsLowEffectChange" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Typical Low Outcome Change from Average</span><br>
+				        <span class="input-label-dark-bg right-text " id="predictsLowEffectChange">{{study.statistics.predictsLowEffectChange}}%</span>
+			        </label>
+			        <label ng-show="study.statistics.pValue" class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">P Value</span><br>
+				        <span class="input-label-dark-bg right-text " id="pValue">{{study.statistics.pValue}}</span>
+			        </label>
+			        <label ng-show="study.statistics.tValue" class="item item-content" style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">T Value</span><br>
+				        <span class="input-label-dark-bg right-text " id="tValue">{{study.statistics.tValue}}</span>
+			        </label>
+			        <label ng-show="study.statistics.criticalTValue" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Critical T Value</span><br>
+				        <span class="input-label-dark-bg right-text " id="criticalTValue">{{study.statistics.criticalTValue}}</span>
+			        </label>
+			        <label ng-show="study.statistics.confidenceInterval" class="item item-content"
+			               style="padding: 6px 10px 5px 16px;">
+				        <span class="input-label-dark-bg left-text">Confidence Interval</span><br>
+				        <span class="input-label-dark-bg right-text "
+				              id="confidenceInterval">{{study.statistics.confidenceInterval}}</span>
+			        </label>
+
+		        </div>
+	        </div>
+
+        </div>
+        <div class="card"
+             ng-if="studyNotFound">
+            <p style="line-height: normal; font-size: 25px;">Not Enough Data</p>
+            <img style="width:100px; height:100px;" ng-src="img/robots/quantimodo-robot-puzzled.svg">
+            <p>
+                I don't have enough data to determine the relationship between
+                {{state.requestParams.causeVariableName}} and {{state.requestParams.effectVariableName}}!
+            </p>
+            <p> Want to help advance citizen science? </p>
+            <div ng-include="'templates/buttons/join-study-button.html'"></div>
+            <div>
+                <p style="font-size: 16px; line-height: 1; text-align: center"> or share it </p>
+                <div ng-include="'templates/fragments/study-sharing-fragment.html'"></div>
+            </div>
+        </div>
+    </ion-content>
+    <div ng-hide="hideNavigationMenu || showRobot"
+         ng-include="'templates/fragments/floating-material-action-button-fragment.html'"></div>
+</ion-view>

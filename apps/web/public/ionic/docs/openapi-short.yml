@@ -1,0 +1,1004 @@
+openapi: 3.0.1
+x-stoplight:
+  id: e2dd35f0e728f
+info:
+  title: QuAnTiMoDo API
+  description: A data platform for accelerating clinical research
+  termsOfService: 'https://quantimo.do/tos'
+  contact:
+    name: hello@quantimo.do
+  license:
+    name: GNU General Public License v3 (GPL-3)
+    url: 'https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)'
+  version: 0.0.1
+servers:
+  - url: 'https://app.quantimo.do/api'
+    description: Production Server
+tags:
+  - name: units
+    description: Available units for measurements
+    externalDocs:
+      description: See it in action
+      url: 'https://web.quantimo.do/#/app/measurement-search?accessToken=demo'
+  - name: variables
+    description: 'Can be used for search auto-complete for data types like symptoms, foods and treatments and include statistics'
+    externalDocs:
+      description: Search for a variable
+      url: 'https://web.quantimo.do/#/app/reminder-search?accessToken=demo'
+  - name: measurements
+    description: 'Measurements are any value that can be recorded like daily steps, a mood rating, or apples eaten.'
+    externalDocs:
+      description: See it in action
+      url: 'https://web.quantimo.do/#/app/history-all-category/Anything?accessToken=demo'
+  - name: analytics
+    description: Identify the strongest predictors of a given outcome and generate studies
+    externalDocs:
+      description: Try it out
+      url: 'https://web.quantimo.do/#/app/predictor-search'
+  - name: connectors
+    description: Import data from third-party apps and devices like Fitbit and Mint.
+    externalDocs:
+      description: Import your data now
+      url: 'https://web.quantimo.do/#/app/import'
+  - name: reminders
+    description: Users can be reminded to track certain variables at a specified frequency with a default value.
+    externalDocs:
+      description: See it in action
+      url: 'https://web.quantimo.do/#/app/reminders-inbox?accessToken=demo'
+  - name: user
+    description: Get or update user info and settings
+    externalDocs:
+      description: See it in action
+      url: 'https://web.quantimo.do/#/app/settings?accessToken=demo'
+  - name: studies
+    description: Automatically generated natural language studies examining the relationship between a predictor and outcome variable including charts.
+    externalDocs:
+      description: Search for a study
+      url: 'https://web.quantimo.do/#/app/studies'
+paths:
+  /v3/measurements:
+    get:
+      tags:
+        - measurements
+      summary: Get measurements for this user
+      description: 'Measurements are any value that can be recorded like daily steps, a mood rating, or apples eaten.'
+      operationId: getMeasurements
+      parameters:
+        - name: variableName
+          in: query
+          description: Measurement id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
+        '401':
+          description: Not Authenticated
+          content: {}
+      security:
+        - bearerAuth: []
+        - curedao_oauth2:
+            - readmeasurements
+  /v3/measurements/post:
+    post:
+      tags:
+        - measurements
+      summary: Post a new set or update existing measurements to the database
+      description: 'You can submit or update multiple measurements in a "measurements" sub-array.  If the variable these measurements correspond to does not already exist in the database, it will be automatically added.'
+      operationId: postMeasurements
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      requestBody:
+        description: An array of measurement sets containing measurement items you want to insert.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MeasurementSet'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostMeasurementsResponse'
+        '401':
+          description: Not Authenticated
+          content: {}
+      security:
+        - bearerAuth: []
+        - curedao_oauth2:
+            - writemeasurements
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    Measurement:
+      required:
+        - sourceName
+        - startTimeString
+        - unitAbbreviatedName
+        - value
+        - variableName
+      type: object
+      properties:
+        clientId:
+          type: string
+          description: 'Ex: curedao'
+        connectorId:
+          type: integer
+          description: 'Ex: 13'
+        createdAt:
+          type: string
+          description: 'Ex: 2017-07-30 21:08:36'
+        displayValueAndUnitString:
+          type: string
+          description: 'Examples: 3/5, $10, or 1 count'
+        iconIcon:
+          type: string
+          description: 'Ex: ion-sad-outline'
+        id:
+          type: integer
+          description: 'Ex: 1051466127'
+        inputType:
+          type: string
+          description: 'Ex: value'
+        ionIcon:
+          type: string
+          description: 'Ex: ion-ios-medkit-outline'
+        manualTracking:
+          type: boolean
+          description: 'Ex: 1'
+        maximumAllowedValue:
+          type: number
+          description: 'Ex: 5. Unit: User-specified or common.'
+          format: double
+        minimumAllowedValue:
+          type: number
+          description: 'Ex: 1. Unit: User-specified or common.'
+          format: double
+        note:
+          type: string
+          description: Note of measurement
+        noteObject:
+          type: object
+          properties: {}
+          description: Additional meta data for the measurement
+        noteHtml:
+          type: object
+          properties: {}
+          description: Embeddable HTML with message hyperlinked with associated url
+        originalUnitId:
+          type: integer
+          description: 'Ex: 23'
+        originalValue:
+          type: number
+          description: 'Original value submitted. Unit: Originally submitted.'
+          format: double
+        pngPath:
+          type: string
+          description: 'Ex: img/variable_categories/treatments.png'
+        pngUrl:
+          type: string
+          description: 'Ex: https://app.quantimo.do/img/variable_categories/treatments.png'
+        productUrl:
+          type: string
+          description: Link to associated product for purchase
+        sourceName:
+          type: string
+          description: Application or device used to record the measurement values
+        startDate:
+          type: string
+          description: 'Ex: 2014-08-27'
+        startTimeEpoch:
+          type: integer
+          description: Seconds between the start of the event measured and 1970 (Unix timestamp)
+        startTimeString:
+          type: string
+          description: 'Start Time for the measurement event in UTC ISO 8601 YYYY-MM-DDThh:mm:ss'
+        svgUrl:
+          type: string
+          description: 'Ex: https://app.quantimo.do/img/variable_categories/treatments.svg'
+        unitAbbreviatedName:
+          type: string
+          description: Abbreviated name for the unit of measurement
+        unitCategoryId:
+          type: integer
+          description: 'Ex: 6'
+        unitCategoryName:
+          type: string
+          description: 'Ex: Miscellany'
+        unitId:
+          type: integer
+          description: 'Ex: 23'
+        unitName:
+          type: string
+          description: 'Ex: Count'
+        updatedAt:
+          type: string
+          description: 'Ex: 2017-07-30 21:08:36'
+        url:
+          type: string
+          description: 'Link to associated Facebook like or GitHub commit, for instance'
+        userVariableUnitAbbreviatedName:
+          type: string
+          description: 'Ex: count'
+        userVariableUnitCategoryId:
+          type: integer
+          description: 'Ex: 6'
+        userVariableUnitCategoryName:
+          type: string
+          description: 'Ex: Miscellany'
+        userVariableUnitId:
+          type: integer
+          description: 'Ex: 23'
+        userVariableUnitName:
+          type: string
+          description: 'Ex: Count'
+        userVariableVariableCategoryId:
+          type: integer
+          description: 'Ex: 13'
+        userVariableVariableCategoryName:
+          type: string
+          description: 'Ex: Treatments'
+        valence:
+          type: string
+          description: 'Valence indicates what type of buttons should be used when recording measurements for this variable. positive - Face buttons with the happiest face equating to a 5/5 rating where higher is better like Overall Mood. negative - Face buttons with the happiest face equating to a 1/5 rating where lower is better like Headache Severity. numeric - Just 1 to 5 numeric buttons for neutral variables. '
+        value:
+          type: number
+          description: Converted measurement value in requested unit
+          format: double
+        variableCategoryId:
+          type: integer
+          description: 'Ex: 13'
+        variableCategoryImageUrl:
+          type: string
+          description: 'Ex: https://static.quantimo.do/img/variable_categories/pill-96.png'
+        variableCategoryName:
+          type: string
+          description: 'Ex: Emotions, Treatments, Symptoms...'
+          enum:
+            - Activity
+            - Books
+            - Causes of Illness
+            - Cognitive Performance
+            - Conditions
+            - Emotions
+            - Environment
+            - Foods
+            - Goals
+            - Locations
+            - Miscellaneous
+            - Movies and TV
+            - Music
+            - Nutrients
+            - Payments
+            - Physical Activities
+            - Physique
+            - Sleep
+            - Social Interactions
+            - Software
+            - Symptoms
+            - Treatments
+            - Vital Signs
+        variableDescription:
+          type: string
+          description: 'Valence indicates what type of buttons should be used when recording measurements for this variable. positive - Face buttons with the happiest face equating to a 5/5 rating where higher is better like Overall Mood. negative - Face buttons with the happiest face equating to a 1/5 rating where lower is better like Headache Severity. numeric - Just 1 to 5 numeric buttons for neutral variables. '
+        variableId:
+          type: integer
+          description: 'Ex: 5956846'
+        variableName:
+          type: string
+          description: Name of the variable for which we are creating the measurement records
+        displayName:
+          type: string
+          description: 'Ex: Trader Joe''s Bedtime Tea'
+    MeasurementItem:
+      required:
+        - timestamp
+        - value
+      type: object
+      properties:
+        note:
+          type: string
+          description: Optional note to include with the measurement
+        timestamp:
+          type: integer
+          description: Timestamp for the measurement event in epoch time (unixtime)
+          format: int64
+        value:
+          type: number
+          description: Measurement value
+          format: double
+    MeasurementSet:
+      required:
+        - measurementItems
+        - sourceName
+        - unitAbbreviatedName
+        - variableName
+      type: object
+      properties:
+        combinationOperation:
+          type: string
+          description: 'Way to aggregate measurements over time. SUM should be used for things like minutes of exercise.  If you use MEAN for exercise, then a person might exercise more minutes in one day but add separate measurements that were smaller.  So when we are doing correlational analysis, we would think that the person exercised less that day even though they exercised more.  Conversely, we must use MEAN for things such as ratings which cannot be SUMMED.'
+          enum:
+            - MEAN
+            - SUM
+        measurementItems:
+          type: array
+          description: 'Array of timestamps, values, and optional notes'
+          items:
+            $ref: '#/components/schemas/MeasurementItem'
+        sourceName:
+          type: string
+          description: Name of the application or device used to record the measurement values
+        unitAbbreviatedName:
+          type: string
+          description: Unit of measurement
+        variableCategoryName:
+          type: string
+          description: 'Ex: Emotions, Treatments, Symptoms...'
+          enum:
+            - Activity
+            - Books
+            - Causes of Illness
+            - Cognitive Performance
+            - Conditions
+            - Emotions
+            - Environment
+            - Foods
+            - Goals
+            - Locations
+            - Miscellaneous
+            - Movies and TV
+            - Music
+            - Nutrients
+            - Payments
+            - Physical Activities
+            - Physique
+            - Sleep
+            - Social Interactions
+            - Software
+            - Symptoms
+            - Treatments
+            - Vital Signs
+        variableName:
+          type: string
+          description: ORIGINAL name of the variable for which we are creating the measurement records
+        upc:
+          type: string
+          description: UPC or other barcode scan result
+    MeasurementUpdate:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Variable id of the measurement to be updated
+        note:
+          type: string
+          description: The new note for the measurement (optional)
+        startTime:
+          type: integer
+          description: The new timestamp for the the event in epoch seconds (optional)
+        value:
+          type: number
+          description: The new value of for the measurement (optional)
+          format: double
+    PostMeasurementsResponse:
+      required:
+        - status
+        - success
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PostMeasurementsDataResponse'
+        message:
+          type: string
+          description: Message
+        description:
+          type: string
+          description: Can be used as body of help info popup
+        summary:
+          type: string
+          description: Can be used as title in help info popup
+        errors:
+          type: array
+          description: Array of error objects with message property
+        status:
+          type: string
+          description: ex. OK or ERROR
+        success:
+          type: boolean
+          description: true or false
+        code:
+          type: number
+          description: Response code such as 200
+        link:
+          type: string
+          description: A super neat url you might want to share with your users!
+    PostMeasurementsDataResponse:
+      type: object
+      properties:
+        userVariables:
+          type: array
+        description:
+          type: string
+          description: Can be used as body of help info popup
+        summary:
+          type: string
+          description: Can be used as title in help info popup
+        errors:
+          type: array
+          description: Array of error objects with message property
+        status:
+          type: string
+          description: ex. OK or ERROR
+        success:
+          type: boolean
+          description: true or false
+        code:
+          type: number
+          description: Response code such as 200
+        link:
+          type: string
+          description: A super neat url you might want to share with your users!
+  parameters:
+    appVersionParam:
+      name: appVersion
+      in: query
+      description: 'Ex: 2.1.1.0'
+      schema:
+        type: string
+    causeVariableNameParam:
+      name: causeVariableName
+      in: query
+      description: 'Deprecated: Name of the hypothetical predictor variable.  Ex: Sleep Duration'
+      schema:
+        type: string
+    causeVariableIdParam:
+      name: causeVariableId
+      in: query
+      description: 'Variable id of the hypothetical predictor variable.  Ex: 1398'
+      schema:
+        type: integer
+    clientIdParam:
+      name: clientId
+      in: query
+      description: 'Your CureDAO client id can be obtained by creating an app at https://builder.quantimo.do'
+      schema:
+        type: string
+    clientSecretParam:
+      name: client_secret
+      in: query
+      description: 'This is the secret for your obtained clientId. We use this to ensure that only your application uses the clientId.  Obtain this by creating a free application at [https://builder.quantimo.do](https://builder.quantimo.do).'
+      schema:
+        type: string
+    clientUserIdParam:
+      name: clientUserId
+      in: query
+      description: 'Ex: 74802'
+      schema:
+        type: integer
+    codeParam:
+      name: code
+      in: query
+      description: Authorization code you received with the previous request.
+      required: true
+      schema:
+        type: string
+    connectorNameParam:
+      name: connectorName
+      in: query
+      description: 'Ex: facebook'
+      schema:
+        type: string
+    connectorNamePathParam:
+      name: connectorName
+      in: path
+      description: Lowercase system name of the source application or device. Get a list of available connectors from the /v3/connectors/list endpoint.
+      required: true
+      schema:
+        type: string
+        enum:
+          - facebook
+          - fitbit
+          - github
+          - googlecalendar
+          - googlefit
+          - medhelper
+          - mint
+          - moodpanda
+          - moodscope
+          - myfitnesspal
+          - mynetdiary
+          - netatmo
+          - rescuetime
+          - runkeeper
+          - slack
+          - sleepcloud
+          - slice
+          - up
+          - whatpulse
+          - withings
+          - worldweatheronline
+          - foursquare
+          - strava
+          - gmail
+    correlationCoefficientParam:
+      name: correlationCoefficient
+      in: query
+      description: Pearson correlation coefficient between cause and effect after lagging by onset delay and grouping by duration of action
+      schema:
+        type: string
+    createdParam:
+      name: created
+      in: query
+      description: These are studies that you have created
+      schema:
+        type: boolean
+    downVotedParam:
+      name: downvoted
+      in: query
+      description: These are studies that you have down-voted
+      schema:
+        type: boolean
+    createdAtParam:
+      name: createdAt
+      in: query
+      description: 'When the record was first created. Use UTC ISO 8601 YYYY-MM-DDThh:mm:ss datetime format. Time zone should be UTC and not local.'
+      schema:
+        type: string
+    doNotConvertParam:
+      name: doNotConvert
+      in: query
+      description: 'Ex: 1'
+      schema:
+        type: boolean
+    doNotProcessParam:
+      name: doNotProcess
+      in: query
+      description: 'Ex: true'
+      schema:
+        type: boolean
+    earliestMeasurementTimeParam:
+      name: earliestMeasurementTime
+      in: query
+      description: 'Excluded records with measurement times earlier than this value. Use UTC ISO 8601 YYYY-MM-DDThh:mm:ss  datetime format. Time zone should be UTC and not local.'
+      schema:
+        type: string
+    effectOrCauseParam:
+      name: effectOrCause
+      in: query
+      description: Provided variable is the effect or cause
+      schema:
+        type: string
+    effectVariableNameParam:
+      name: effectVariableName
+      in: query
+      description: 'Deprecated: Name of the outcome variable of interest.  Ex: Overall Mood'
+      schema:
+        type: string
+    effectVariableIdParam:
+      name: effectVariableId
+      in: query
+      description: 'Variable id of the outcome variable of interest.  Ex: 1398'
+      schema:
+        type: integer
+    exactMatchParam:
+      name: exactMatch
+      in: query
+      description: Require exact match
+      schema:
+        type: boolean
+    grantTypeParam:
+      name: grant_type
+      in: query
+      description: Grant Type can be 'authorization_code' or 'refresh_token'
+      required: true
+      schema:
+        type: string
+    groupingTimezoneParam:
+      name: groupingTimezone
+      in: query
+      description: The time (in seconds) over which measurements are grouped together
+      schema:
+        type: string
+    groupingWidthParam:
+      name: groupingWidth
+      in: query
+      description: The time (in seconds) over which measurements are grouped together
+      schema:
+        type: integer
+    includeAuthorizedClientsParam:
+      name: includeAuthorizedClients
+      in: query
+      description: 'Return list of apps, studies, and individuals with access to user data'
+      schema:
+        type: boolean
+    includeChartsParam:
+      name: includeCharts
+      in: query
+      description: Highcharts configs that can be used if you have highcharts.js included on the page.  This only works if the id or name query parameter is also provided.
+      schema:
+        type: boolean
+    includeDeletedParam:
+      name: includeDeleted
+      in: query
+      description: Include deleted variables
+      schema:
+        type: boolean
+    includePrivateParam:
+      name: includePrivate
+      in: query
+      description: Include user-specific variables in results
+      schema:
+        type: boolean
+    includePublicParam:
+      name: includePublic
+      in: query
+      description: Include variables the user has no measurements for
+      schema:
+        type: boolean
+    includeTagsParam:
+      name: includeTags
+      in: query
+      description: 'Return parent, child, duplicate, and ingredient variables'
+      schema:
+        type: boolean
+    joinedParam:
+      name: joined
+      in: query
+      description: These are studies that you have joined
+      schema:
+        type: boolean
+    lastSourceParam:
+      name: lastSourceName
+      in: query
+      description: 'Limit variables to those which measurements were last submitted by a specific source. So if you have a client application and you only want variables that were last updated by your app, you can include the name of your app here'
+      schema:
+        type: string
+    latestMeasurementTimeParam:
+      name: latestMeasurementTime
+      in: query
+      description: 'Excluded records with measurement times later than this value. Use UTC ISO 8601 YYYY-MM-DDThh:mm:ss  datetime format. Time zone should be UTC and not local.'
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: 'The LIMIT is used to limit the number of results returned. So if youhave 1000 results, but only want to the first 10, you would set this to 10 and offset to 0. The maximum limit is 200 records.'
+      schema:
+        type: integer
+        default: 100
+    log:
+      name: log
+      in: query
+      description: Username or email
+      schema:
+        type: string
+    manualTrackingParam:
+      name: manualTracking
+      in: query
+      description: Only include variables tracked manually by the user
+      schema:
+        type: boolean
+    minMaxFilterParam:
+      name: minMaxFilter
+      in: query
+      description: 'Ex: 1'
+      schema:
+        type: boolean
+    numberOfRawMeasurementsParam:
+      name: numberOfRawMeasurements
+      in: query
+      description: Filter variables by the total number of measurements that they have. This could be used of you want to filter or sort by popularity.
+      schema:
+        type: string
+    offsetParam:
+      name: offset
+      in: query
+      description: 'OFFSET says to skip that many rows before beginning to return rows to the client. OFFSET 0 is the same as omitting the OFFSET clause.If both OFFSET and LIMIT appear, then OFFSET rows are skipped before starting to count the LIMIT rows that are returned.'
+      schema:
+        minimum: 0
+        type: integer
+    onlyPastParam:
+      name: onlyPast
+      in: query
+      description: 'Ex: 1'
+      schema:
+        type: boolean
+    openParam:
+      name: open
+      in: query
+      description: These are studies that anyone can join
+      schema:
+        type: boolean
+    outcomesOfInterestParam:
+      name: outcomesOfInterest
+      in: query
+      description: Only include correlations for which the effect is an outcome of interest for the user
+      schema:
+        type: boolean
+    platform:
+      name: platform
+      in: query
+      description: 'Ex: chrome, android, ios, web'
+      schema:
+        type: string
+        enum:
+          - chrome
+          - android
+          - ios
+          - web
+    aggregatedParam:
+      name: aggregated
+      in: query
+      description: These are aggregated n=1 studies based on the entire population of users that have shared their data
+      schema:
+        type: boolean
+    principalInvestigatorUserIdParam:
+      name: principalInvestigatorUserId
+      in: query
+      description: These are studies created by a specific principal investigator
+      schema:
+        type: integer
+    publicEffectOrCauseParam:
+      name: publicEffectOrCause
+      in: query
+      description: 'Ex: '
+      schema:
+        type: string
+    pwd:
+      name: pwd
+      in: query
+      description: User password
+      schema:
+        type: string
+    recalculate:
+      name: recalculate
+      in: query
+      description: Recalculate instead of using cached analysis
+      schema:
+        type: boolean
+    redirectUriParam:
+      name: redirect_uri
+      in: query
+      description: The redirect URI is the URL within your client application that will receive the OAuth2 credentials.
+      schema:
+        type: string
+    reminderTimeParam:
+      name: reminderTime
+      in: query
+      description: 'Ex: (lt)2017-07-31 21:43:26'
+      schema:
+        type: string
+    responseTypeParam:
+      name: response_type
+      in: query
+      description: 'If the value is code, launches a Basic flow, requiring a POST to the token endpoint to obtain the tokens. If the value is token id_token or id_token token, launches an Implicit flow, requiring the use of Javascript at the redirect URI to retrieve tokens from the URI #fragment.'
+      required: true
+      schema:
+        type: string
+    scopeParam:
+      name: scope
+      in: query
+      description: 'Scopes include basic, readmeasurements, and writemeasurements. The `basic` scope allows you to read user info (displayName, email, etc). The `readmeasurements` scope allows one to read a user''s data. The `writemeasurements` scope allows you to write user data. Separate multiple scopes by a space.'
+      required: true
+      schema:
+        type: string
+    searchPhraseParam:
+      name: searchPhrase
+      in: query
+      description: 'Ex: %Body Fat%'
+      schema:
+        type: string
+    sortParam:
+      name: sort
+      in: query
+      description: 'Sort by one of the listed field names. If the field name is prefixed with `-`, it will sort in descending order.'
+      schema:
+        type: string
+    sourceNameParam:
+      name: sourceName
+      in: query
+      description: ID of the source you want measurements for (supports exact name match only)
+      schema:
+        type: string
+    stateParam:
+      name: state
+      in: query
+      description: 'An opaque string that is round-tripped in the protocol; that is to say, it is returned as a URI parameter in the Basic flow, and in the URI'
+      schema:
+        type: string
+    studyClientIdParam:
+      name: studyId
+      in: query
+      description: Client id for the study you want
+      schema:
+        type: string
+    synonymsParam:
+      name: synonyms
+      in: query
+      description: 'Ex: McDonalds hotcake'
+      schema:
+        type: string
+    taggedVariableIdParam:
+      name: taggedVariableId
+      in: query
+      description: Id of the tagged variable (i.e. Lollipop) you would like to get variables it can be tagged with (i.e. Sugar).  Converted measurements of the tagged variable are included in analysis of the tag variable (i.e. ingredient).
+      schema:
+        type: integer
+    tagVariableIdParam:
+      name: tagVariableId
+      in: query
+      description: Id of the tag variable (i.e. Sugar) you would like to get variables it can be tagged to (i.e. Lollipop).  Converted measurements of the tagged variable are included in analysis of the tag variable (i.e. ingredient).
+      schema:
+        type: integer
+    unitNameParam:
+      name: unitName
+      in: query
+      description: 'Ex: Milligrams'
+      schema:
+        type: string
+        enum:
+          - '% Recommended Daily Allowance'
+          - '-4 to 4 Rating'
+          - 0 to 1 Rating
+          - 0 to 5 Rating
+          - 1 to 10 Rating
+          - 1 to 5 Rating
+          - Applications
+          - Beats per Minute
+          - Calories
+          - Capsules
+          - Centimeters
+          - Count
+          - Degrees Celsius
+          - Degrees East
+          - Degrees Fahrenheit
+          - Degrees North
+          - Dollars
+          - Drops
+          - Event
+          - Feet
+          - Grams
+          - Hours
+          - Inches
+          - Index
+          - Kilocalories
+          - Kilograms
+          - Kilometers
+          - Liters
+          - Meters
+          - Micrograms
+          - Micrograms per decilitre
+          - Miles
+          - Milligrams
+          - Milliliters
+          - Millimeters
+          - Millimeters Merc
+          - Milliseconds
+          - Minutes
+          - Pascal
+          - Percent
+          - Pieces
+          - Pills
+          - Pounds
+          - Puffs
+          - Seconds
+          - Serving
+          - Sprays
+          - Tablets
+          - Torr
+          - Units
+          - Yes/No
+          - per Minute
+          - Doses
+          - Quarts
+          - Ounces
+          - International Units
+          - Meters per Second
+    updatedAtParam:
+      name: updatedAt
+      in: query
+      description: 'When the record was last updated. Use UTC ISO 8601 YYYY-MM-DDThh:mm:ss datetime format. Time zone should be UTC and not local.'
+      schema:
+        type: string
+    userIdParam:
+      name: userId
+      in: query
+      description: User's id
+      schema:
+        type: number
+    valueParam:
+      name: value
+      in: query
+      description: Value of measurement
+      schema:
+        type: string
+    variableCategoryIdParam:
+      name: variableCategoryId
+      in: query
+      description: 'Ex: 13'
+      schema:
+        type: integer
+    variableIdParam:
+      name: variableId
+      in: query
+      description: 'Ex: 13'
+      schema:
+        type: integer
+    variableCategoryNameParam:
+      name: variableCategoryName
+      in: query
+      description: 'Ex: Emotions, Treatments, Symptoms...'
+      schema:
+        type: string
+        enum:
+          - Activities
+          - Books
+          - Causes of Illness
+          - Cognitive Performance
+          - Conditions
+          - Emotions
+          - Environment
+          - Foods
+          - Location
+          - Miscellaneous
+          - Movies and TV
+          - Music
+          - Nutrients
+          - Payments
+          - Physical Activity
+          - Physique
+          - Sleep
+          - Social Interactions
+          - Software
+          - Symptoms
+          - Treatments
+          - Vital Signs
+          - Goals
+    variableNameParam:
+      name: variableName
+      in: query
+      description: Name of the variable you want measurements for
+      schema:
+        type: string
+    conciseParam:
+      name: concise
+      in: query
+      description: Only return field required for variable auto-complete searches.  The smaller size allows for storing more variable results locally reducing API requests.
+      schema:
+        type: boolean
+  securitySchemes:
+    access_token:
+      type: apiKey
+      name: access_token
+      in: query
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    client_id:
+      type: apiKey
+      name: clientId
+      in: query
+    curedao_oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://app.quantimo.do/oauth/authorize'
+          tokenUrl: 'https://app.quantimo.do/oauth/token'
+          scopes:
+            basic: 'Allows you to read user info (display name, email, etc)'
+            readmeasurements: Allows one to read a user's measurements
+            writemeasurements: Allows you to write user measurements

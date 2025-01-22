@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>How are you?</title>
+		<link rel="stylesheet" type="text/css" href="css/popup.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
+		<!--suppress HtmlUnknownTarget -->
+		<script src="cordova.js"></script>
+		<!-- build:js scripts/popup-combined-head-libraries.js -->
+		<script src="https://static.quantimo.do/lib/q/q.js"></script>
+		<script src="https://static.quantimo.do/lib/bugsnag/dist/bugsnag.js"></script>
+		<script src="lib/quantimodo/quantimodo-web.js"></script>
+		<script src="https://static.quantimo.do/lib/localforage/dist/localforage.js"></script>
+		<script src="https://static.quantimo.do/lib/underscore/underscore-min.js"></script>
+		<script src="js/qmLogger.js"></script>
+		<script src="js/qmHelpers.js"></script>
+		<script src="data/appSettings.js"></script>
+		<!-- Must come after qmHelpers because we assign to qm.staticData -->
+		<script defer src="data/qmStates.js"></script>
+		<script defer src="data/stateNames.js"></script>
+		<script defer src="data/buildInfo.js"></script>
+		<script defer src="data/units.js"></script>
+		<script defer src="data/variableCategories.js"></script>
+		<script defer src="data/commonVariables.js"></script>
+		<script defer src="data/docs.js"></script>
+		<script defer src="data/dialogAgent.js"></script>
+		<script src="js/popup.js"></script>
+		<!-- endbuild -->
+	</head>
+	<body>
+		<div id="questionBox" 
+		     class="questionBox">
+			<p class="question"
+			   id="question">
+				How are you?
+			</p>
+			<div id="buttons-section"
+					class="buttons-section">
+				<section id="faceRatingButtons"
+				         class="rating-section futuristic-font">
+					<img src="img/rating/face_rating_button_256_depressed.png"
+					     id="buttonMoodDepressed"
+					     alt="Rate 5 out of 5"
+					     title="Worst">
+					<span>&nbsp;</span>
+					<img src="img/rating/face_rating_button_256_sad.png"
+					     id="buttonMoodSad"
+					     alt="Rate 5 out of 5"
+					     title="Bad">
+					<span>&nbsp;</span>
+					<img src="img/rating/face_rating_button_256_ok.png"
+					     id="buttonMoodOk"
+					     alt="Rate 5 out of 5"
+					     title="OK">
+					<span>&nbsp;</span>
+					<img src="img/rating/face_rating_button_256_happy.png"
+					     id="buttonMoodHappy"
+					     alt="Rate 5 out of 5"
+					     title="Good">
+					<span>&nbsp;</span>
+					<img src="img/rating/face_rating_button_256_ecstatic.png"
+					     id="buttonMoodEcstatic"
+					     alt="Rate 5 out of 5"
+					     title="Best">
+				</section>
+				<section id="numericRatingButtons" class="rating-section">
+					<img src="img/rating/numeric_rating_button_256_1.png"
+					     id="button1"
+					     alt="Rate 1 out of 5"
+					     title="Weakest">
+					<span>&nbsp;</span>
+					<img src="img/rating/numeric_rating_button_256_2.png"
+					     id="button2"
+					     alt="Rate 2 out of 5"
+					     title="Weak">
+					<span>&nbsp;</span>
+					<img src="img/rating/numeric_rating_button_256_3.png"
+					     id="button3"
+					     alt="Rate 3 out of 5"
+					     title="Moderate">
+					<span>&nbsp;</span>
+					<img src="img/rating/numeric_rating_button_256_4.png"
+					     id="button4"
+					     alt="Rate 4 out of 5"
+					     title="Strong">
+					<span>&nbsp;</span>
+					<img src="img/rating/numeric_rating_button_256_5.png"
+					     id="button5"
+					     alt="Rate 5 out of 5"
+					     title="Strongest">
+				</section>
+				<section id="lastValueSection"
+				         class="rating-section">
+					<button id="lastValueButton"
+					        style="color: #337ab7; border: 3px solid #337ab7;"
+					        class="btn-xl">
+						<span id="lastValue">How are you?</span>
+					</button>
+					<button id="secondToLastValueButton"
+					        style="color: #5cb85c; border: 3px solid #5cb85c;"
+					        type="button"
+					        class="btn btn-success btn-circle btn-xl">
+						<span id="secondToLastValue">How are you?</span>
+					</button>
+					<button id="thirdToLastValueButton"
+					        style="color: #5bc0de; border: 3px solid #5bc0de;"
+					        type="button"
+					        class="btn btn-info btn-circle btn-xl">
+						<span id="thirdToLastValue">How are you?</span>
+					</button>
+					<button id="snoozeButton"
+					        title="Snooze and ask me later"
+					        style="color: #f0ad4e; border: 3px solid #f0ad4e;"
+					        type="button"
+					        class="btn-xl">
+						z
+						<sup> z
+							<sup> z</sup>
+						</sup>
+					</button>
+					<button id="skipButton"
+					        title="Skip this time"
+					        style="color: #d9534f; border: 3px solid #d9534f; font-size: 24px;"
+					        type="button"
+					        class="btn btn-danger btn-circle btn-xl">X
+					</button>
+					<button id="buttonInbox"
+					        title="Go to Full Inbox for More Options"
+					        style="color: #5cb85c; border: 3px solid #5cb85c; font-size: 24px;"
+					        type="button"
+					        class="btn btn-success btn-circle btn-xl">
+						?
+					</button>
+				</section>
+			</div>
+			<section id="loader">
+				<!--<img src="img/loaders/rainbow-loader.gif" id="popTartCat">-->
+				<img style="max-height: 100%"
+				     src="img/loaders/purple-upload-check-loader_cropped_56px.gif"
+				     id="purpleLoader"
+				     alt="Loading Image">
+				<!--<img src="img/loaders/pop_tart_cat_blue_background.gif" id="popTartCat">-->
+			</section>
+<!--			<img src="https://app.quantimo.do/app/public/img/intro/inbox.svg"
+			     title="Go to Full Inbox for More Options"
+			     id="inboxImage" alt="Go to Full Inbox for More Options">-->
+		</div>
+	</body>
+</html>

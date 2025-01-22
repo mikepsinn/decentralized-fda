@@ -1,0 +1,42 @@
+<ion-view hide-nav-bar="hideNavigationMenu">
+	<ion-nav-title>FDAi</ion-nav-title>
+	<canvas id="rainbow-canvas"
+	        style="position: absolute; z-index: 1; display: block; opacity: 0.5; pointer-events: none; background-color: transparent;"></canvas>
+	<div id="splash-screen"
+	     class="splash-wrapper" style="width: 100%; position: absolute; height: 100%;">
+		<div class="splash-grid"></div>
+	</div>
+	<div style="display: flex; justify-content: center; align-items: flex-start; height: 100%; width: 100%; position: absolute; margin-top: 10%;">
+		<div style="position: relative;">
+			<div ng-hide="state.hideTriangle"
+			     ng-include="'templates/splash-logo.html'" style="z-index: 3;">
+			</div>
+		</div>
+	</div>
+	<ion-slide-box on-slide-changed="state.slideChanged(index)" style="z-index: 2;">
+		<ion-slide ng-repeat="slide in state.slides">
+			<div ng-if="state.title">
+				hi
+				{{ state.title }}
+			</div>
+			<div ng-if="slide.title">
+				{{ slide.title }}
+			</div>
+			<img ng-if="slide.image"
+			     ng-src="{{slide.image}}"
+			     style="max-width: 90%;
+            max-height: 90%;
+            margin: 10px auto;
+            display: block;
+            border-radius: 20px;
+            object-fit: contain;
+            border: 5px solid #00ff00; /* Neon green border */
+            box-shadow: 0 0 10px #00ff00; /* Neon green shadow */">
+		</ion-slide>
+	</ion-slide-box>
+	<div ng-show="true"
+	     ng-include="'templates/robot.html'"
+	     ng-click="robotClick()"
+	     class="robot-container"
+	     style="left: calc(50% - 80px);"></div>
+</ion-view>

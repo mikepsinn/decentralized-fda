@@ -1,0 +1,328 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Mr+Dafoe&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo:wght@900&display=swap");
+
+:root {
+	--background-color: #7c59b9; /* Purple background */
+	--card-background-color: #f3e5ff; /* Light purple for cards */
+	--text-color: #ffffff; /* White text */
+	--accent-color: #000000; /* Bright pink for accents */
+	--button-color: #ff00ff; /* Bright pink for buttons */
+	--button-hover-color: #cc00cc; /* Darker pink for hover state */
+	--border-color: #ffffff; /* White for borders */
+}
+
+body {
+	font-family: 'Arial', sans-serif;
+	margin: 20px;
+	text-align: center;
+}
+
+body, html {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.container {
+	padding: 20px;
+}
+
+.title {
+	text-align: center;
+	font-size: 2.5rem;
+	color: var(--text-color);
+	margin-bottom: 1rem;
+}
+
+.card {
+	background: #5b2d83;
+	border: 4px solid var(--border-color);
+	box-shadow: 5px 5px 0 var(--accent-color);
+	padding: 1rem;
+	margin-bottom: 1rem;
+	/* border-radius: 10px; */ /* Optional: if you want rounded corners */
+}
+
+.pretty-button {
+	background: #5b2d83;
+	border: 4px solid var(--border-color);
+	box-shadow: 5px 5px 0 var(--accent-color);
+	padding: 1rem;
+	margin-bottom: 1rem;
+	font-size: 1.75rem;
+	color: var(--text-color);
+	cursor: pointer;
+
+	/* border-radius: 10px; */ /* Optional: if you want rounded corners */
+}
+
+.option {
+	margin-bottom: 1rem;
+}
+
+.option-label {
+	display: block;
+	margin-bottom: 0.5rem;
+	font-size: 1.75rem;
+	color: var(--text-color);
+}
+
+.input-field, select {
+	width: 100%;
+	background: var(--background-color);
+	border: 2px solid var(--border-color);
+	color: var(--text-color);
+	padding: 1.5rem;
+	font-family: 'Press Start 2P', cursive;
+	box-shadow: 3px 3px 0 var(--accent-color);
+	margin-bottom: 1rem;
+	/* border-radius: 5px; */ /* Optional: if you want rounded corners */
+}
+
+.question {
+	/* width: 100%; */
+	/* background: var(--background-color); */
+	/* border: 2px solid var(--border-color); */
+	color: #494949;
+	/* padding: 1.5rem; */
+	font-family: "Exo", serif;
+	/*font-family: 'Press Start 2P', cursive;*/
+	/* box-shadow: 3px 3px 0 var(--accent-color); */
+	/* margin-bottom: 1rem; */
+	/* border-radius: 5px; */ /* Optional: if you want rounded corners */
+	/* line-height: 2; */
+	font-size: x-large;
+	margin: 13px 13px 5px;
+	/* margin-top: 10px; */
+}
+
+.questionBox {
+	min-width: 400px;
+	min-height: 130px;
+	position: relative;
+	/* background: #ffffff; */
+	/* border: 2px solid var(--border-color); */
+	color: var(--text-color);
+	/* padding: 0.5rem; */
+	font-family: "Exo", serif;
+	/*font-family: 'Press Start 2P', cursive;*/
+	/* box-shadow: 3px 3px 0 var(--accent-color); */
+	/*	margin-bottom: 1rem;*/
+	/* border-radius: 5px; */ /* Optional: if you want rounded corners */
+	/* line-height: 2; */
+	/* margin: 10px; */
+}
+
+input[type="radio"] {
+	accent-color: var(--button-color); /* This will style the radio button color */
+}
+
+.status {
+	margin-top: 20px;
+	color: var(--button-color); /* Success color */
+	font-size: 0.75rem;
+	text-align: center;
+}
+
+
+/* Modify the button on hover and active states to enhance the 3D effect */
+button:hover {
+    box-shadow: 
+        2px 2px 0px var(--accent-color), 
+        4px 4px 0px var(--accent-color), 
+        6px 6px 0px var(--accent-color);
+}
+
+button:active {
+    box-shadow: none;
+}
+
+button:hover {
+	/* background-color: var(--button-hover-color); */
+	box-shadow: 1px 1px 0 var(--accent-color);
+}
+
+
+
+
+.lines {
+	position: fixed;
+	width: 100vw;
+	height: 4em;
+	background: linear-gradient(rgba(89, 193, 254, 0.2) 20%, #59c1fe 40%, #59c1fe 60%, rgba(89, 193, 254, 0.2) 80%);
+	background-size: 1px 0.5em;
+	box-shadow: 0 0 1em rgba(89, 193, 254, 0.4);
+	transform: translateY(-12em);
+	left: 0;
+}
+
+h1 {
+	position: relative;
+	font-family: "Exo", serif;
+	font-size: 9em;
+	margin: 0;
+	transform: skew(-15deg);
+	letter-spacing: 0.03em;
+}
+h1::after {
+	content: "";
+	position: absolute;
+	top: -0.1em;
+	right: 0.05em;
+	width: 0.4em;
+	height: 0.4em;
+	background: radial-gradient(white 3%, rgba(255, 255, 255, 0.3) 15%, rgba(255, 255, 255, 0.05) 60%, transparent 80%), radial-gradient(rgba(255, 255, 255, 0.2) 50%, transparent 60%) 50% 50%/5% 100%, radial-gradient(rgba(255, 255, 255, 0.2) 50%, transparent 60%) 50% 50%/70% 5%;
+	background-repeat: no-repeat;
+}
+h1 span:first-child {
+	display: block;
+	text-shadow: 0 0 0.1em #8ba2d0, 0 0 0.2em black, 0 0 5em #165ff3;
+	-webkit-text-stroke: 0.06em rgba(0, 0, 0, 0.5);
+}
+h1 span:last-child {
+	position: absolute;
+	left: 0px;
+	top: 0;
+	background-image: linear-gradient(#032d50 25%, #00a1ef 35%, white 50%, #20125f 50%, #8313e7 55%, #ff61af 75%);
+	-webkit-text-stroke: 0.01em #94a0b9;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	text-align: center;
+}
+
+h2 {
+	font-family: "Mr Dafoe", sans-serif;
+	font-size: 5.5em;
+	color: white;
+	text-shadow: 0 0 0.05em #fff, 0 0 0.2em #fe05e1, 0 0 0.3em #fe05e1;
+	transform: rotate(-7deg);
+	margin: -0.6em 0 20px;
+}
+
+.grid {
+	background: linear-gradient(transparent 65%, rgba(46, 38, 255, 0.4) 75%, #7d41e6 80%, rgba(46, 38, 255, 0.4) 85%, transparent 95%), linear-gradient(90deg, transparent 65%, rgba(46, 38, 255, 0.4) 75%, #7d41e6 80%, rgba(46, 38, 255, 0.4) 85%, transparent 95%);
+	background-size: 30px 30px;
+	width: 200vw;
+	height: 300vh;
+	position: absolute;
+	bottom: -123vh;
+	transform: rotateX(-100deg);
+	-webkit-mask-image: linear-gradient(black, rgba(0, 0, 0, 0) 80%);
+}
+
+.rating-section {
+	width: 100%;
+	opacity: 1;
+	height: 56px;
+	padding-top: 5px;
+	padding-bottom: 1px;
+	cursor: pointer;
+}
+
+.rating-section img {
+	width: 15%;
+	display: inline-block;
+	padding-left: 4px;
+	padding-right: 4px;
+	background-color: #FFFFFF;
+	transition: all 200ms linear;
+}
+
+.rating-section img:hover {
+	-webkit-filter: brightness(110%) saturate(125%);
+}
+
+#loader {
+	display: none;
+	transition: opacity 400ms linear;
+	margin: auto;
+	padding-top: 10px;
+	background-color: #edeaec;
+}
+
+.invisible {
+	-webkit-animation-name: fadeOut;
+	-webkit-animation-duration: 0.4s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes fadeOut {
+	from {
+		-webkit-transform: rotate(0deg) scale(1) skew(0deg);
+		opacity: 1;
+	}
+	to {
+		-webkit-transform: rotate(0deg) scale(0.98) skew(0deg);
+		opacity: 0;
+	}
+}
+
+.visible {
+	-webkit-animation-name: fadeIn;
+	-webkit-animation-duration: 0.3s;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes fadeIn {
+	from {
+		-webkit-transform: rotate(0deg) scale(1.02) skew(0deg);
+		opacity: 0;
+	}
+	to {
+		-webkit-transform: rotate(0deg) scale(1) skew(0deg);
+		opacity: 1;
+	}
+}
+
+.btn-xl {
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+    background-color: white;
+    line-height: 1.33;
+    transition: all 200ms linear;
+	font-family: "Exo", serif;
+    /*font-family: "Comic Sans MS", cursive, sans-serif;*/
+	cursor: pointer;
+}
+
+.btn-xl:focus {
+    outline: none;
+}
+
+.btn-xl:hover {
+    -webkit-filter: brightness(110%) saturate(125%);
+}
+
+.btn-xl:active {
+    /* Remove the box shadow on active state to give a pressed button effect */
+    box-shadow: none;
+}
+
+.futuristic-font {
+	font-family: 'Orbitron', sans-serif;
+}
+		
+.buttons-section {
+	/* width: 100%; */
+	/* opacity: 1; */
+	/* height: 56px; */
+	/* padding-top: 5px; */
+	padding-bottom: 14px;
+}
+
+#inboxImage {
+	width: 24px;
+	cursor: pointer;
+	position: absolute;
+	top: 0;
+	right: 0;
+}

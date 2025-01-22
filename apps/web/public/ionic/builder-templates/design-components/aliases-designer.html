@@ -1,0 +1,59 @@
+<md-card>
+    <md-card-content>
+        <p>
+            You can replace any word in the app with another word. 
+
+        </p>
+        <p>
+            For instance, you might want to replace the word 
+            "patient" with the word "client" and 
+            "physician" with the word "dietitian"
+             for a diet tracking app.
+        </p>
+        <form name="state.aliasForm" ng-submit="state.addAlias()">
+            <md-input-container>
+                <label for="newOriginal">Enter Word to Replace</label>
+                <input id="newOriginal" name="newOriginal" ng-model="state.newAlias.original" required>
+            </md-input-container>
+            <md-input-container>
+                <label for="newReplacement">Enter Word to Replace It With</label>
+                <input id="newReplacement" name="newReplacement" ng-model="state.newAlias.replacement" required>
+            </md-input-container>
+            <md-button type="submit" 
+                ng-click="state.addAlias($index)"
+                ng-disabled="!state.aliasForm.$valid"
+                class="md-primary md-raised">
+                <ion-icon name="trash"></ion-icon>
+                Add Alias
+            </md-button>
+        </form>
+	    <md-list>
+            <md-list-item class="md-1-line" 
+                          style="max-width: 300px;"
+                          ng-repeat="pair in appSettings.appDesign.wordAliases track by $index">
+				<md-card class="flex justify-between" style="width: auto; height: auto;">  <!-- Removed max-width to allow cards to resize based on contents -->
+					<md-card-content>
+						<div>
+							<strong>Original:</strong> {{pair.original}}
+						</div>
+						<div>
+							<strong>Replacement:</strong> {{pair.replacement}}
+						</div>
+					</md-card-content>
+					<md-button type="submit" 
+						ng-click="state.deleteAlias($index)" class="md-fab"
+						aria-label="Delete Alias"
+						style="position: absolute; top: 0; right: 0; padding: 0;">  <!--
+						 Increased 
+						scale to
+						 1 to make the icon twice as large and adjusted position to keep button inside the card -->
+						<md-tooltip md-direction="top">
+							Delete Alias
+						</md-tooltip>
+                        <i name="trash" class="ion-trash-a" style="font-size: 2em;"></i>  <!-- Increased font-size to make the icon twice as large -->
+					</md-button>
+				</md-card>
+			</md-list-item>
+	    </md-list>
+    </md-card-content>
+</md-card>
