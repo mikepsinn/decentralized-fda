@@ -38,6 +38,48 @@ const nextConfig = {
     ]
   },
   output: 'standalone',
+  // Add rewrite rules for the ionic app and its assets
+  async rewrites() {
+    return [
+      {
+        source: '/ionic',
+        destination: '/ionic/index.html',
+      },
+      {
+        source: '/ionic/:path*',
+        destination: '/ionic/:path*',
+      },
+      // Handle root-level asset requests when in ionic context
+      {
+        source: '/js/:file*',
+        destination: '/ionic/js/:file*',
+      },
+      {
+        source: '/css/:file*',
+        destination: '/ionic/css/:file*',
+      },
+      {
+        source: '/fonts/:file*',
+        destination: '/ionic/fonts/:file*',
+      },
+      {
+        source: '/lib/:file*',
+        destination: '/ionic/lib/:file*',
+      },
+      {
+        source: '/data/:file*',
+        destination: '/ionic/data/:file*',
+      },
+      {
+        source: '/templates/:file*',
+        destination: '/ionic/templates/:file*',
+      },
+      {
+        source: '/highcharts/:file*',
+        destination: '/ionic/highcharts/:file*',
+      }
+    ]
+  },
 }
 
 module.exports = withBundleAnalyzer(nextConfig)
