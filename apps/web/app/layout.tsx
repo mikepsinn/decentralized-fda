@@ -14,6 +14,7 @@ import { getCurrentUser } from "@/lib/session";
 import { getNavigationForDomain } from "@/config/navigation";
 import DfdaTopNavbar from "./components/DfdaTopNavbar";
 import DFDAFooter from "./components/DFDAFooter";
+import { KeycloakProvider } from '@/components/auth/KeycloakProvider';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -84,31 +85,33 @@ export default async function RootLayout({children}: RootLayoutProps) {
       <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased", spaceGrotesk.className)}>
       <Providers> {/* Wrap the application with Providers */}
-        <CopilotKit url="/api/copilot/openai/">
-          <NextTopLoader color="#DC2645" height={2.5} showSpinner={false}/>
-          <div
-              vaul-drawer-wrapper=""
-              className="flex min-h-screen flex-col bg-background"
-          >
+        <KeycloakProvider>
+          <CopilotKit url="/api/copilot/openai/">
+            <NextTopLoader color="#DC2645" height={2.5} showSpinner={false}/>
             <div
-                className="flex min-h-screen flex-col bg-gradient-to-br from-cyan-300 to-purple-400 p-4 font-mono text-black md:p-8">
-              <DfdaTopNavbar
-                  user={{
-                    name: user?.name,
-                    image: user?.image,
-                    email: user?.email,
-                  }}
-                  topNavItems={navigation.topNav}
-                  avatarNavItems={navigation.avatarNav}
-              />
-              <main className="flex-1">{children}</main>
-              <div className="px-4 pb-4">
-                <DFDAFooter navItems={navigation.footerNav}/>
+                vaul-drawer-wrapper=""
+                className="flex min-h-screen flex-col bg-background"
+            >
+              <div
+                  className="flex min-h-screen flex-col bg-gradient-to-br from-cyan-300 to-purple-400 p-4 font-mono text-black md:p-8">
+                <DfdaTopNavbar
+                    user={{
+                      name: user?.name,
+                      image: user?.image,
+                      email: user?.email,
+                    }}
+                    topNavItems={navigation.topNav}
+                    avatarNavItems={navigation.avatarNav}
+                />
+                <main className="flex-1">{children}</main>
+                <div className="px-4 pb-4">
+                  <DFDAFooter navItems={navigation.footerNav}/>
+                </div>
               </div>
             </div>
-          </div>
-          <Toaster/>
-        </CopilotKit>
+            <Toaster/>
+          </CopilotKit>
+        </KeycloakProvider>
       </Providers>
       </body>
       </html>

@@ -1,19 +1,185 @@
-version: "3"
+version: '3.5'
+
+networks:
+  frontend:
+    name: frontend
+  storage:
+    name: storage
+  dfda-network:
+    driver: bridge
 
 volumes:
-  database:
-    driver: local
+  data-elasticsearch:
+  data-mongo:
+  postgres_data:
 
 services:
-  mysql:
-    platform: linux/amd64
-    image: mysql:8.0.32
-    container_name: turborepo_mysql
+  keycloak:
+    container_name: dfda-keycloak
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=postgres
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_HEALTH_ENABLED=true
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: start-dev
+    networks:
+      - dfda-network
+      - frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  postgres:
+    container_name: dfda-postgres
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dfda-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  mongodb:
+    image: mongo:${MONGODB_VERSION:-6.0.8}
+    container_name: gio_apim_mongodb
+    restart: always
+    volumes:
+      - data-mongo:/data/db
+    networks:
+      - storage
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.8.1}
+    container_name: gio_apim_elasticsearch
+    restart: always
+    volumes:
+      - data-elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.security.enabled=false
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile: 65536
+    networks:
+      - storage
+
+  gateway:
+    image: graviteeio/apim-gateway:${APIM_VERSION:-4}
+    container_name: gio_apim_gateway
     restart: always
     ports:
-      - 3306:3306
+      - "8082:8082"
+    depends_on:
+      - mongodb
+      - elasticsearch
+      - keycloak
     environment:
-      MYSQL_DATABASE: turborepo
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-    volumes:
-      - database:/var/lib/mysql
+      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_ratelimit_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_reporters_elasticsearch_endpoints_0=http://elasticsearch:9200
+    networks:
+      - storage
+      - frontend
+      - dfda-network
+
+  management_api:
+    image: graviteeio/apim-management-api:${APIM_VERSION:-4}
+    container_name: gio_apim_management_api
+    restart: always
+    ports:
+      - "8083:8083"
+    links:
+      - mongodb
+      - elasticsearch
+    depends_on:
+      - mongodb
+      - elasticsearch
+      - keycloak
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_analytics_elasticsearch_endpoints_0=http://elasticsearch:9200
+      - gravitee_installation_standalone_portal_url=http://localhost:8085
+      - gravitee_security_providers_0_type=oauth2
+      - gravitee_security_providers_0_configuration_clientId=gravitee-management
+      - gravitee_security_providers_0_configuration_clientSecret=${GRAVITEE_MANAGEMENT_SECRET:-secret}
+      - gravitee_security_providers_0_configuration_tokenEndpoint=http://keycloak:8080/realms/gravitee/protocol/openid-connect/token
+      - gravitee_security_providers_0_configuration_authorizationEndpoint=http://localhost:8080/realms/gravitee/protocol/openid-connect/auth
+      - gravitee_security_providers_0_configuration_userInfoEndpoint=http://keycloak:8080/realms/gravitee/protocol/openid-connect/userinfo
+      - gravitee_security_providers_0_configuration_accessTokenProperty=access_token
+      - gravitee_security_providers_0_configuration_authorizationHeader=Bearer %s
+    networks:
+      - storage
+      - frontend
+      - dfda-network
+
+  management_ui:
+    image: graviteeio/apim-management-ui:${APIM_VERSION:-4}
+    container_name: gio_apim_management_ui
+    restart: always
+    ports:
+      - "8084:8080"
+    depends_on:
+      - management_api
+      - keycloak
+    environment:
+      - MGMT_API_URL=http://localhost:8083/management/organizations/DEFAULT/environments/DEFAULT/
+      - GRAVITEEIO_SECURITY_TYPE=oauth2
+      - GRAVITEEIO_SECURITY_OAUTH2_CLIENT_ID=gravitee-management
+      - GRAVITEEIO_SECURITY_OAUTH2_CLIENT_SECRET=${GRAVITEE_MANAGEMENT_SECRET:-secret}
+      - GRAVITEEIO_SECURITY_OAUTH2_AUTHORIZE_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/auth
+      - GRAVITEEIO_SECURITY_OAUTH2_TOKEN_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/token
+      - GRAVITEEIO_SECURITY_OAUTH2_USERINFO_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/userinfo
+      - GRAVITEEIO_SECURITY_OAUTH2_LOGOUT_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/logout
+    networks:
+      - frontend
+      - dfda-network
+
+  portal_ui:
+    image: graviteeio/apim-portal-ui:${APIM_VERSION:-4}
+    container_name: gio_apim_portal_ui
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      - management_api
+      - keycloak
+    environment:
+      - PORTAL_API_URL=http://localhost:8083/portal/environments/DEFAULT
+      - GRAVITEEIO_SECURITY_TYPE=oauth2
+      - GRAVITEEIO_SECURITY_OAUTH2_CLIENT_ID=gravitee-portal
+      - GRAVITEEIO_SECURITY_OAUTH2_CLIENT_SECRET=${GRAVITEE_PORTAL_SECRET:-secret}
+      - GRAVITEEIO_SECURITY_OAUTH2_AUTHORIZE_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/auth
+      - GRAVITEEIO_SECURITY_OAUTH2_TOKEN_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/token
+      - GRAVITEEIO_SECURITY_OAUTH2_USERINFO_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/userinfo
+      - GRAVITEEIO_SECURITY_OAUTH2_LOGOUT_ENDPOINT=http://localhost:8080/realms/gravitee/protocol/openid-connect/logout
+    networks:
+      - frontend
+      - dfda-network

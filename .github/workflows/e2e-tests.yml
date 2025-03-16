@@ -1,0 +1,97 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    services:
+      keycloak:
+        image: quay.io/keycloak/keycloak:latest
+        env:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: admin
+          KC_DB: dev-file
+        ports:
+          - 8080:8080
+        options: >-
+          --health-cmd "curl -f http://localhost:8080/health/ready || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install --with-deps
+
+    - name: Setup Keycloak
+      run: |
+        # Wait for Keycloak to be ready
+        timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
+        
+        # Create test realm and user using Keycloak Admin CLI
+        curl -X POST http://localhost:8080/admin/realms \
+          -H "Authorization: Bearer $(curl -d 'client_id=admin-cli' -d 'username=admin' -d 'password=admin' -d 'grant_type=password' 'http://localhost:8080/realms/master/protocol/openid-connect/token' | jq -r '.access_token')" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "realm": "dfda",
+            "enabled": true,
+            "users": [
+              {
+                "username": "test-user",
+                "enabled": true,
+                "credentials": [
+                  {
+                    "type": "password",
+                    "value": "test-password",
+                    "temporary": false
+                  }
+                ]
+              }
+            ],
+            "clients": [
+              {
+                "clientId": "web-client",
+                "enabled": true,
+                "publicClient": true,
+                "redirectUris": ["http://localhost:3000/*"],
+                "webOrigins": ["http://localhost:3000"]
+              }
+            ]
+          }'
+
+    - name: Run Playwright tests
+      run: pnpm exec playwright test
+      env:
+        NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080
+        NEXT_PUBLIC_KEYCLOAK_REALM: dfda
+        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: web-client
+        E2E_TEST_USERNAME: test-user
+        E2E_TEST_PASSWORD: test-password
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30 

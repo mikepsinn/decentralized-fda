@@ -1,0 +1,50 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Copy env file
+      run: cp .env.example .env
+
+    - name: Start services
+      run: |
+        docker-compose up -d
+        # Wait for services to be ready
+        npm run wait-for-services
+
+    - name: Run integration tests
+      run: npm test
+
+    - name: Collect logs on failure
+      if: failure()
+      run: |
+        docker-compose logs > docker-logs.txt
+        echo "::group::Docker Logs"
+        cat docker-logs.txt
+        echo "::endgroup::"
+
+    - name: Upload logs as artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-logs
+        path: docker-logs.txt 
