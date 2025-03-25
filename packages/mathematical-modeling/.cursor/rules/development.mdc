@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Keep the [README.md](mdc:README.md) updated with check marks indicating what's complete and what's next to implement
+- Refer to [README.md](mdc:README.md) regularly to avoid deviation
+
