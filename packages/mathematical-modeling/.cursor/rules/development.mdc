@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: true
 ---
-- always keep in mind the core goal of creating the simplest possible library that will calculate the secondary outcomes of an intervention with sufficient detail and rigor to help a government official decide whether or not to fund an intervention. 
+- always keep in mind the core goal of creating the simplest possible library that will be used by developers in websites to calculate the secondary outcomes of an intervention with sufficient detail and rigor to help a government official decide whether or not to fund an intervention
 - Keep the [README.md](mdc:README.md) updated with check marks indicating what's complete and what's next to implement
 - Refer to [README.md](mdc:README.md) regularly to avoid deviation
 - Use ts for data files

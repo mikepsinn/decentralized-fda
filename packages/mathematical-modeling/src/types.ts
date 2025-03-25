@@ -73,52 +73,64 @@ export interface CalculationResult {
   populationSize: number;
   timestamp: string;
   parameterValues: Record<string, number>;
-  healthMetrics: HealthMetricResult[];
-  economicOutcomes: EconomicOutcomeResult[];
-  totalEconomicImpact: EconomicImpactResult;
-  costEffectivenessMetrics: CostEffectivenessMetrics;
-  budgetImpact: BudgetImpactAnalysis;
-  medicareImpact?: MedicareImpactAnalysis;
-}
-
-interface BaseMetricResult {
-  metricId: string;
-  baselineValue: number;
-  postInterventionValue: number;
-  absoluteChange: number;
-  relativeChange: number;
-  lowerBound: number;
-  upperBound: number;
-}
-
-export interface HealthMetricResult extends BaseMetricResult {}
-export interface EconomicOutcomeResult extends BaseMetricResult {}
-export interface EconomicImpactResult extends BaseMetricResult {}
-
-export interface CostEffectivenessMetrics {
-  incrementalCostEffectivenessRatio: number;
-  numberNeededToTreat: number;
-  returnOnInvestment: number;
-  paybackPeriod: number;
-}
-
-export interface BudgetImpactAnalysis {
-  yearByYearImpact: YearlyBudgetImpact[];
-  fiveYearTotalImpact: number;
-}
-
-export interface YearlyBudgetImpact {
-  year: number;
-  populationCovered: number;
-  interventionCost: number;
-  costSavings: number;
-  netBudgetImpact: number;
-}
-
-export interface MedicareImpactAnalysis {
-  perBeneficiarySavings: number;
-  fiveYearProgramSavings: number;
-  trustFundImpactStatement: string;
+  primaryOutcomes: {
+    id: string;
+    baselineValue: number;
+    postInterventionValue: number;
+    absoluteChange: number;
+    relativeChange: number; // percentage
+    lowerBound: number; // 95% confidence interval
+    upperBound: number; // 95% confidence interval
+  }[];
+  secondaryHealthOutcomes: {
+    id: string;
+    baselineValue: number;
+    postInterventionValue: number;
+    absoluteChange: number;
+    relativeChange: number; // percentage
+    lowerBound: number; // 95% confidence interval
+    upperBound: number; // 95% confidence interval
+    primaryOutcomeId: string; // Links back to primary outcome that caused this effect
+  }[];
+  secondaryEconomicOutcomes: {
+    id: string;
+    baselineValue: number;
+    postInterventionValue: number;
+    absoluteChange: number;
+    relativeChange: number; // percentage
+    lowerBound: number; // 95% confidence interval
+    upperBound: number; // 95% confidence interval
+    primaryOutcomeId: string; // Links back to primary outcome that caused this effect
+  }[];
+  totalEconomicImpact: {
+    baselineValue: number;
+    postInterventionValue: number;
+    absoluteChange: number;
+    relativeChange: number; // percentage
+    lowerBound: number; // 95% confidence interval
+    upperBound: number; // 95% confidence interval
+  };
+  costEffectivenessMetrics: {
+    incrementalCostEffectivenessRatio: number; // $ per QALY gained
+    numberNeededToTreat: number; // Number of people who need the intervention to prevent one adverse outcome
+    returnOnInvestment: number; // Percentage return on intervention cost
+    paybackPeriod: number; // Years to recoup intervention costs
+  };
+  budgetImpact: {
+    yearByYearImpact: {
+      year: number;
+      populationCovered: number;
+      interventionCost: number;
+      costSavings: number;
+      netBudgetImpact: number;
+    }[];
+    fiveYearTotalImpact: number;
+  };
+  medicareImpact?: {
+    perBeneficiarySavings: number;
+    fiveYearProgramSavings: number;
+    trustFundImpactStatement: string;
+  };
 }
 
 // Sensitivity analysis types
@@ -141,12 +153,14 @@ export interface SensitivityResult {
 
 // Decision threshold types
 export interface DecisionThresholds {
-  costEffectivenessThresholds: ThresholdLevels;
-  budgetImpactThresholds: ThresholdLevels;
-}
-
-export interface ThresholdLevels {
-  favorable: number;
-  acceptable: number;
-  unfavorable: number;
+  costEffectivenessThresholds: {
+    favorable: number; // e.g., $50,000/QALY
+    acceptable: number; // e.g., $100,000/QALY
+    unfavorable: number; // e.g., $150,000/QALY
+  };
+  budgetImpactThresholds: {
+    lowImpact: number; // e.g., <$10M/year
+    moderateImpact: number; // e.g., $10M-$50M/year
+    highImpact: number; // e.g., >$50M/year
+  };
 }

@@ -100,8 +100,8 @@ interface CalculationResult {
   populationSize: number;
   timestamp: string;
   parameterValues: Record<string, number>;
-  healthMetrics: {
-    metricId: string;
+  primaryOutcomes: {
+    id: string;
     baselineValue: number;
     postInterventionValue: number;
     absoluteChange: number;
@@ -109,14 +109,25 @@ interface CalculationResult {
     lowerBound: number; // 95% confidence interval
     upperBound: number; // 95% confidence interval
   }[];
-  economicOutcomes: {
-    outcomeId: string;
+  secondaryHealthOutcomes: {
+    id: string;
     baselineValue: number;
     postInterventionValue: number;
     absoluteChange: number;
     relativeChange: number; // percentage
     lowerBound: number; // 95% confidence interval
     upperBound: number; // 95% confidence interval
+    primaryOutcomeId: string; // Links back to primary outcome that caused this effect
+  }[];
+  secondaryEconomicOutcomes: {
+    id: string;
+    baselineValue: number;
+    postInterventionValue: number;
+    absoluteChange: number;
+    relativeChange: number; // percentage
+    lowerBound: number; // 95% confidence interval
+    upperBound: number; // 95% confidence interval
+    primaryOutcomeId: string; // Links back to primary outcome that caused this effect
   }[];
   totalEconomicImpact: {
     baselineValue: number;
