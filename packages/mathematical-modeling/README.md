@@ -2,12 +2,12 @@
 
 ## Implementation Status
 - ✅ Data model definitions
-- ⬜ Calculation engine implementation
-- ⬜ Sensitivity analysis implementation
-- ⬜ Cost-effectiveness calculations
-- ⬜ Budget impact calculations
-- ⬜ Equation parsing utilities
-- ⬜ Formatting utilities
+- ✅ Calculation engine implementation
+- ✅ Sensitivity analysis implementation
+- ✅ Cost-effectiveness calculations
+- ✅ Budget impact calculations
+- ✅ Equation parsing utilities
+- ✅ Formatting utilities
 
 ## Overview
 
@@ -223,6 +223,138 @@ interface DecisionThresholds {
        └── research-funding.ts     # Research funding thresholds
 
 ```
+
+
+### Data File Structure
+
+The system uses several types of data files, not just intervention files:
+
+1. **Intervention Files** (`/data/interventions/`)
+
+1. Contains intervention-specific data (primary outcomes, secondary outcomes)
+2. Example: `muscle-mass-intervention.ts`
+
+
+
+2. **Population Files** (`/data/populations/`)
+
+1. Contains population profiles (demographics, baseline health metrics)
+2. Example: `medicare-beneficiaries.ts`, `us-population.ts`
+
+
+
+3. **Parameter Registry** (`/data/parameters/`)
+
+1. Central registry of all parameters used across interventions
+2. Example: `parameter-registry.ts`
+
+
+
+4. **Decision Threshold Files** (`/data/decision-thresholds/`)
+
+1. Contains thresholds for decision-making (cost-effectiveness, budget impact)
+2. Example: `medicare-thresholds.ts`
+
+
+
+5. **Calculation Constants** (`/data/constants/`)
+
+1. Contains constants used in calculations (discount rates, conversion factors)
+2. Example: `calculation-constants.ts`
+
+
+
+
+
+### Data Flow to UI Components
+
+Here's how data flows from these files to UI components:
+
+1. **Index Files** aggregate and export data:
+
+```typescript
+// data/interventions/index.ts
+import muscleMassIntervention from "./muscle-mass-intervention";
+import vitaminDIntervention from "./vitamin-d-intervention";
+
+export const interventions = [muscleMassIntervention, vitaminDIntervention];
+
+export function getInterventionById(id: string) {
+  return interventions.find(intervention => intervention.id === id);
+}
+```
+
+
+2. **Data Access Layer** provides methods to access and combine data:
+
+```typescript
+// lib/data-access.ts
+import { interventions, getInterventionById } from "@/data/interventions";
+import { populations, getPopulationById } from "@/data/populations";
+import { thresholds } from "@/data/decision-thresholds";
+
+export function getInterventionWithPopulation(interventionId: string, populationId: string) {
+  const intervention = getInterventionById(interventionId);
+  const population = getPopulationById(populationId);
+  
+  return { intervention, population };
+}
+```
+
+
+3. **UI Components** import from the data access layer:
+
+```typescript
+// app/interventions/[id]/page.tsx
+import { getInterventionById } from "@/lib/data-access";
+
+export default function InterventionPage({ params }: { params: { id: string } }) {
+  const intervention = getInterventionById(params.id);
+  // ...render the page
+}
+```
+
+
+4. **Calculation Engine** combines data from multiple sources:
+
+```typescript
+// lib/calculation-engine.ts
+import { getInterventionById } from "@/data/interventions";
+import { getPopulationById } from "@/data/populations";
+import { getThresholds } from "@/data/decision-thresholds";
+
+export function calculateResults(interventionId: string, populationId: string, parameterValues: Record<string, number>) {
+  const intervention = getInterventionById(interventionId);
+  const population = getPopulationById(populationId);
+  const thresholds = getThresholds();
+  
+  // Perform calculations using all data sources
+  // ...
+  
+  return results;
+}
+```
+
+
+### Separation of Concerns
+
+The data architecture follows these principles:
+
+1. **Intervention files** contain only intervention-specific data
+2. **Population files** contain population-specific data
+3. **Parameter registry** provides a central source for parameters
+4. **Decision thresholds** are stored separately from interventions
+5. **Calculation engine** combines data from multiple sources
+6. **UI components** import only the data they need
+
+
+This separation ensures that:
+
+- Data is not duplicated across files
+- UI components can be reused with different data
+- Calculations can combine data from multiple sources
+- New interventions or populations can be added without changing UI code
+
 
 ## Example Implementation
 
