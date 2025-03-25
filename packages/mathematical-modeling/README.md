@@ -1,5 +1,14 @@
 ### Mathematical Modeling Library for Health & Economic Impact Analysis
 
+## Implementation Status
+- ✅ Data model definitions
+- ⬜ Calculation engine implementation
+- ⬜ Sensitivity analysis implementation
+- ⬜ Cost-effectiveness calculations
+- ⬜ Budget impact calculations
+- ⬜ Equation parsing utilities
+- ⬜ Formatting utilities
+
 ## Overview
 
 A TypeScript library for modeling the health and economic impacts of medical interventions. This library enables analysis of secondary population-level effects, translating health metrics into economic outcomes like healthcare cost savings, productivity gains, and quality-adjusted life years (QALYs).
