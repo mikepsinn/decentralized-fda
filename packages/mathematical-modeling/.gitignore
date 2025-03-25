@@ -1,0 +1,7 @@
+# Environment variables
+.env
+
+# Database backups
+db-backup/
+
+# ... existing code ... 

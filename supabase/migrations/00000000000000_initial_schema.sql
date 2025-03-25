@@ -2289,6 +2289,3 @@ ALTER TABLE scheduling.service_providers ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE scheduling.service_types ENABLE ROW LEVEL SECURITY;
 
-
--- Seed data (in dependency order)
-

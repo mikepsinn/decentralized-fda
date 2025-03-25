@@ -10,9 +10,11 @@
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "backup-db": "tsx scripts/backup-db.ts"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.7.2",
     "react": "^18.2.0"
   },
   "devDependencies": {
@@ -25,7 +27,8 @@
     "prettier": "^3.0.0",
     "jest": "^29.0.0",
     "ts-jest": "^29.0.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.1"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
