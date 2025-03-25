@@ -1,5 +1,9 @@
 ### Mathematical Modeling Library for Health & Economic Impact Analysis
 
+# Primary Objective
+
+The simplest possible library that will calculate the secondary outcomes of an intervention with sufficient detail and rigor to help a government official decide whether or not to fund an intervention. 
+
 ## Implementation Status
 - ✅ Data model definitions
 - ✅ Calculation engine implementation

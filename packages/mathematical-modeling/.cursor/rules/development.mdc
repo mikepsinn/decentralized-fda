@@ -3,8 +3,12 @@ description:
 globs: 
 alwaysApply: true
 ---
+- always keep in mind the core goal of creating the simplest possible library that will calculate the secondary outcomes of an intervention with sufficient detail and rigor to help a government official decide whether or not to fund an intervention. 
 - Keep the [README.md](mdc:README.md) updated with check marks indicating what's complete and what's next to implement
 - Refer to [README.md](mdc:README.md) regularly to avoid deviation
 - Use ts for data files
 - Run `pnpm type-check`, `pnpm format`, and `pnpm lint` regularly and fix problems before moving to new features 
+- Do not change [types.ts](mdc:src/types.ts)! Make sure all the data files you generate match the types defined there.
+- The [README.md](mdc:README.md) is the single source of truth and [types.ts](mdc:src/types.ts) should mirror it perfectly
+
 
