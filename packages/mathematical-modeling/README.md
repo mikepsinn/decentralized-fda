@@ -23,13 +23,13 @@ interface BaseEntity {
   id: string;
   name: string;
   description?: string;
+  emoji?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 // Datasource types
-interface Datasource {
-  id: string;
+interface Datasource extends BaseEntity {
   url: string;
   title?: string;
   author?: string;
@@ -41,11 +41,7 @@ interface Datasource {
 }
 
 // Parameter types
-interface Parameter {
-  id: string;
-  name: string;
-  emoji?: string;
-  description?: string;
+interface Parameter extends BaseEntity {
   unit?: string;
   defaultValue: number;
   bestCaseValue?: number;
@@ -54,11 +50,7 @@ interface Parameter {
 }
 
 // Primary outcome types
-interface PrimaryOutcome {
-  id: string;
-  name: string;
-  emoji?: string;
-  description?: string;
+interface PrimaryOutcome extends BaseEntity {
   unit?: string;
   defaultValue: number;
   bestCaseValue?: number;
@@ -68,11 +60,7 @@ interface PrimaryOutcome {
 }
 
 // Secondary outcome types
-interface SecondaryOutcome {
-  id: string;
-  name: string;
-  emoji?: string;
-  description?: string;
+interface SecondaryOutcome extends BaseEntity {
   unit?: string;
   equationText: string;
   baselineValue: number;
