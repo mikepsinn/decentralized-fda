@@ -1,9 +1,9 @@
 import {
   BudgetImpactAnalysis,
   EconomicOutcomeResult,
-  YearlyBudgetImpact
-} from './types';
-import { FormatUtils } from './format-utils';
+  YearlyBudgetImpact,
+} from "./types";
+import { FormatUtils } from "./format-utils";
 
 /**
  * Budget impact analysis module
@@ -20,13 +20,13 @@ export class BudgetImpactAnalyzer {
       discountRate?: number;
       populationGrowthRate?: number;
       uptakeRates?: number[];
-    } = {}
+    } = {},
   ): BudgetImpactAnalysis {
     const {
       timeHorizon = 5,
       discountRate = 3,
       populationGrowthRate = 1,
-      uptakeRates = this.generateDefaultUptakeRates(timeHorizon)
+      uptakeRates = this.generateDefaultUptakeRates(timeHorizon),
     } = options;
 
     const yearlyImpact: YearlyBudgetImpact[] = [];
@@ -37,8 +37,18 @@ export class BudgetImpactAnalyzer {
       const uptakeRate = uptakeRates[year - 1];
       const populationCovered = cumulativePopulation * (uptakeRate / 100);
 
-      const interventionCost = this.calculateYearlyCosts(costs, year, discountFactor, populationCovered);
-      const costSavings = this.calculateYearlySavings(costs, year, discountFactor, populationCovered);
+      const interventionCost = this.calculateYearlyCosts(
+        costs,
+        year,
+        discountFactor,
+        populationCovered,
+      );
+      const costSavings = this.calculateYearlySavings(
+        costs,
+        year,
+        discountFactor,
+        populationCovered,
+      );
       const netBudgetImpact = costSavings - interventionCost;
 
       yearlyImpact.push({
@@ -46,16 +56,16 @@ export class BudgetImpactAnalyzer {
         populationCovered,
         interventionCost,
         costSavings,
-        netBudgetImpact
+        netBudgetImpact,
       });
 
       // Update population for next year
-      cumulativePopulation *= (1 + populationGrowthRate / 100);
+      cumulativePopulation *= 1 + populationGrowthRate / 100;
     }
 
     return {
       yearByYearImpact: yearlyImpact,
-      fiveYearTotalImpact: this.calculateTotalImpact(yearlyImpact)
+      fiveYearTotalImpact: this.calculateTotalImpact(yearlyImpact),
     };
   }
 
@@ -66,16 +76,21 @@ export class BudgetImpactAnalyzer {
     costs: EconomicOutcomeResult[],
     year: number,
     discountFactor: number,
-    populationCovered: number
+    populationCovered: number,
   ): number {
     const interventionCosts = costs
-      .filter(c => c.metricId.toLowerCase().includes('cost'))
+      .filter((c) => c.metricId.toLowerCase().includes("cost"))
       .reduce((sum, c) => sum + c.absoluteChange, 0);
 
     // Assume costs decrease over time due to efficiency gains
     const efficiencyFactor = Math.pow(0.95, year - 1); // 5% efficiency gain per year
-    
-    return interventionCosts * discountFactor * efficiencyFactor * (populationCovered / costs[0]?.populationSize ?? 1);
+
+    return (
+      interventionCosts *
+      discountFactor *
+      efficiencyFactor *
+      (populationCovered / costs[0]?.populationSize ?? 1)
+    );
   }
 
   /**
@@ -85,16 +100,21 @@ export class BudgetImpactAnalyzer {
     costs: EconomicOutcomeResult[],
     year: number,
     discountFactor: number,
-    populationCovered: number
+    populationCovered: number,
   ): number {
     const annualSavings = costs
-      .filter(c => c.metricId.toLowerCase().includes('savings'))
+      .filter((c) => c.metricId.toLowerCase().includes("savings"))
       .reduce((sum, c) => sum + c.absoluteChange, 0);
 
     // Assume savings increase over time as the intervention becomes more effective
     const effectivenessFactor = Math.min(1.5, Math.pow(1.1, year - 1)); // Max 50% increase
-    
-    return annualSavings * discountFactor * effectivenessFactor * (populationCovered / costs[0]?.populationSize ?? 1);
+
+    return (
+      annualSavings *
+      discountFactor *
+      effectivenessFactor *
+      (populationCovered / costs[0]?.populationSize ?? 1)
+    );
   }
 
   /**
@@ -126,30 +146,30 @@ export class BudgetImpactAnalyzer {
       lowImpact: number;
       moderateImpact: number;
       highImpact: number;
-    }
+    },
   ): {
-    assessment: 'low' | 'moderate' | 'high';
+    assessment: "low" | "moderate" | "high";
     explanation: string;
   } {
     const averageAnnualImpact = Math.abs(analysis.fiveYearTotalImpact / 5);
 
     if (averageAnnualImpact <= thresholds.lowImpact) {
       return {
-        assessment: 'low',
-        explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} is below the low impact threshold of ${FormatUtils.formatCurrency(thresholds.lowImpact)}`
+        assessment: "low",
+        explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} is below the low impact threshold of ${FormatUtils.formatCurrency(thresholds.lowImpact)}`,
       };
     }
 
     if (averageAnnualImpact <= thresholds.moderateImpact) {
       return {
-        assessment: 'moderate',
-        explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} indicates moderate budgetary implications`
+        assessment: "moderate",
+        explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} indicates moderate budgetary implications`,
       };
     }
 
     return {
-      assessment: 'high',
-      explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} exceeds the moderate impact threshold of ${FormatUtils.formatCurrency(thresholds.moderateImpact)}`
+      assessment: "high",
+      explanation: `Average annual budget impact of ${FormatUtils.formatCurrency(averageAnnualImpact)} exceeds the moderate impact threshold of ${FormatUtils.formatCurrency(thresholds.moderateImpact)}`,
     };
   }
 
@@ -162,18 +182,20 @@ export class BudgetImpactAnalyzer {
       lowImpact: number;
       moderateImpact: number;
       highImpact: number;
-    }
+    },
   ): string {
     const evaluation = this.evaluateBudgetImpact(analysis, thresholds);
     const { yearByYearImpact, fiveYearTotalImpact } = analysis;
 
-    const yearlyReports = yearByYearImpact.map(year => [
-      `Year ${year.year}:`,
-      `  - Population Covered: ${FormatUtils.formatWithUnits(year.populationCovered, 'people')}`,
-      `  - Intervention Cost: ${FormatUtils.formatCurrency(year.interventionCost)}`,
-      `  - Cost Savings: ${FormatUtils.formatCurrency(year.costSavings)}`,
-      `  - Net Impact: ${FormatUtils.formatCurrency(year.netBudgetImpact)}`
-    ].join('\n'));
+    const yearlyReports = yearByYearImpact.map((year) =>
+      [
+        `Year ${year.year}:`,
+        `  - Population Covered: ${FormatUtils.formatWithUnits(year.populationCovered, "people")}`,
+        `  - Intervention Cost: ${FormatUtils.formatCurrency(year.interventionCost)}`,
+        `  - Cost Savings: ${FormatUtils.formatCurrency(year.costSavings)}`,
+        `  - Net Impact: ${FormatUtils.formatCurrency(year.netBudgetImpact)}`,
+      ].join("\n"),
+    );
 
     return [
       `Budget Impact Analysis Summary:`,
@@ -186,7 +208,7 @@ export class BudgetImpactAnalyzer {
       `Five-Year Total Impact: ${FormatUtils.formatCurrency(fiveYearTotalImpact)}`,
       `Average Annual Impact: ${FormatUtils.formatCurrency(fiveYearTotalImpact / 5)}`,
       ``,
-      `This intervention has a ${evaluation.assessment} impact on the budget.`
-    ].join('\n');
+      `This intervention has a ${evaluation.assessment} impact on the budget.`,
+    ].join("\n");
   }
-} 
+}

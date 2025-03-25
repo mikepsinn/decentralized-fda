@@ -21,7 +21,13 @@ export interface Datasource extends BaseEntity {
   year?: number;
   doi?: string;
   quote?: string;
-  citationType?: "journal" | "website" | "book" | "report" | "conference" | "other";
+  citationType?:
+    | "journal"
+    | "website"
+    | "book"
+    | "report"
+    | "conference"
+    | "other";
 }
 
 // Configurable parameter with uncertainty ranges
@@ -143,4 +149,4 @@ export interface ThresholdLevels {
   favorable: number;
   acceptable: number;
   unfavorable: number;
-} 
+}

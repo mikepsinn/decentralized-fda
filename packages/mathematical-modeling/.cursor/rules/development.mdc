@@ -5,4 +5,6 @@ alwaysApply: true
 ---
 - Keep the [README.md](mdc:README.md) updated with check marks indicating what's complete and what's next to implement
 - Refer to [README.md](mdc:README.md) regularly to avoid deviation
+- Use ts for data files
+- Run `pnpm type-check`, `pnpm format`, and `pnpm lint` regularly and fix problems before moving to new features 
 

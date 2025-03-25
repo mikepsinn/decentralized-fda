@@ -1,9 +1,9 @@
 import {
   CostEffectivenessMetrics,
   EconomicOutcomeResult,
-  HealthMetricResult
-} from './types';
-import { FormatUtils } from './format-utils';
+  HealthMetricResult,
+} from "./types";
+import { FormatUtils } from "./format-utils";
 
 /**
  * Cost-effectiveness analysis module
@@ -14,17 +14,20 @@ export class CostEffectivenessAnalyzer {
    */
   public calculateMetrics(
     costs: EconomicOutcomeResult[],
-    healthOutcomes: HealthMetricResult[]
+    healthOutcomes: HealthMetricResult[],
   ): CostEffectivenessMetrics {
     const totalCosts = this.calculateTotalCosts(costs);
     const totalQALYs = this.calculateTotalQALYs(healthOutcomes);
     const annualSavings = this.calculateAnnualSavings(costs);
 
     return {
-      incrementalCostEffectivenessRatio: this.calculateICER(totalCosts, totalQALYs),
+      incrementalCostEffectivenessRatio: this.calculateICER(
+        totalCosts,
+        totalQALYs,
+      ),
       numberNeededToTreat: this.calculateNNT(healthOutcomes),
       returnOnInvestment: this.calculateROI(totalCosts, annualSavings),
-      paybackPeriod: this.calculatePaybackPeriod(totalCosts, annualSavings)
+      paybackPeriod: this.calculatePaybackPeriod(totalCosts, annualSavings),
     };
   }
 
@@ -33,7 +36,7 @@ export class CostEffectivenessAnalyzer {
    */
   private calculateTotalCosts(costs: EconomicOutcomeResult[]): number {
     return costs
-      .filter(c => c.metricId.toLowerCase().includes('cost'))
+      .filter((c) => c.metricId.toLowerCase().includes("cost"))
       .reduce((sum, c) => sum + c.absoluteChange, 0);
   }
 
@@ -42,7 +45,7 @@ export class CostEffectivenessAnalyzer {
    */
   private calculateTotalQALYs(outcomes: HealthMetricResult[]): number {
     return outcomes
-      .filter(o => o.metricId.toLowerCase().includes('qaly'))
+      .filter((o) => o.metricId.toLowerCase().includes("qaly"))
       .reduce((sum, o) => sum + o.absoluteChange, 0);
   }
 
@@ -51,7 +54,7 @@ export class CostEffectivenessAnalyzer {
    */
   private calculateAnnualSavings(costs: EconomicOutcomeResult[]): number {
     return costs
-      .filter(c => c.metricId.toLowerCase().includes('savings'))
+      .filter((c) => c.metricId.toLowerCase().includes("savings"))
       .reduce((sum, c) => sum + c.absoluteChange, 0);
   }
 
@@ -87,7 +90,10 @@ export class CostEffectivenessAnalyzer {
   /**
    * Calculate Payback Period in years
    */
-  private calculatePaybackPeriod(totalCosts: number, annualSavings: number): number {
+  private calculatePaybackPeriod(
+    totalCosts: number,
+    annualSavings: number,
+  ): number {
     if (annualSavings <= 0) return Infinity;
     return totalCosts / annualSavings;
   }
@@ -101,30 +107,30 @@ export class CostEffectivenessAnalyzer {
       favorable: number;
       acceptable: number;
       unfavorable: number;
-    }
+    },
   ): {
-    assessment: 'favorable' | 'acceptable' | 'unfavorable';
+    assessment: "favorable" | "acceptable" | "unfavorable";
     explanation: string;
   } {
     const { incrementalCostEffectivenessRatio: icer } = metrics;
 
     if (icer <= thresholds.favorable) {
       return {
-        assessment: 'favorable',
-        explanation: `ICER of ${FormatUtils.formatICER(icer)} is below the favorable threshold of ${FormatUtils.formatCurrency(thresholds.favorable)}/QALY`
+        assessment: "favorable",
+        explanation: `ICER of ${FormatUtils.formatICER(icer)} is below the favorable threshold of ${FormatUtils.formatCurrency(thresholds.favorable)}/QALY`,
       };
     }
 
     if (icer <= thresholds.acceptable) {
       return {
-        assessment: 'acceptable',
-        explanation: `ICER of ${FormatUtils.formatICER(icer)} is within acceptable range (${FormatUtils.formatCurrency(thresholds.favorable)}-${FormatUtils.formatCurrency(thresholds.acceptable)}/QALY)`
+        assessment: "acceptable",
+        explanation: `ICER of ${FormatUtils.formatICER(icer)} is within acceptable range (${FormatUtils.formatCurrency(thresholds.favorable)}-${FormatUtils.formatCurrency(thresholds.acceptable)}/QALY)`,
       };
     }
 
     return {
-      assessment: 'unfavorable',
-      explanation: `ICER of ${FormatUtils.formatICER(icer)} exceeds the acceptable threshold of ${FormatUtils.formatCurrency(thresholds.acceptable)}/QALY`
+      assessment: "unfavorable",
+      explanation: `ICER of ${FormatUtils.formatICER(icer)} exceeds the acceptable threshold of ${FormatUtils.formatCurrency(thresholds.acceptable)}/QALY`,
     };
   }
 
@@ -137,10 +143,15 @@ export class CostEffectivenessAnalyzer {
       favorable: number;
       acceptable: number;
       unfavorable: number;
-    }
+    },
   ): string {
     const evaluation = this.evaluateCostEffectiveness(metrics, thresholds);
-    const { incrementalCostEffectivenessRatio, numberNeededToTreat, returnOnInvestment, paybackPeriod } = metrics;
+    const {
+      incrementalCostEffectivenessRatio,
+      numberNeededToTreat,
+      returnOnInvestment,
+      paybackPeriod,
+    } = metrics;
 
     return [
       `Cost-Effectiveness Analysis Summary:`,
@@ -150,7 +161,7 @@ export class CostEffectivenessAnalyzer {
       `- Return on Investment: ${FormatUtils.formatChange(returnOnInvestment, { asPercentage: true })} over 5 years`,
       `- Payback Period: ${FormatUtils.formatYears(paybackPeriod)}`,
       ``,
-      `This intervention is ${evaluation.assessment} from a cost-effectiveness perspective.`
-    ].join('\n');
+      `This intervention is ${evaluation.assessment} from a cost-effectiveness perspective.`,
+    ].join("\n");
   }
-} 
+}

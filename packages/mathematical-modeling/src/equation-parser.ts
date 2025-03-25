@@ -17,10 +17,10 @@ export class EquationParser {
     try {
       // Replace variables with their values
       const evaluableEquation = this.replaceVariables(equation, context);
-      
+
       // Create a safe evaluation context
-      const safeEval = new Function('return ' + evaluableEquation);
-      
+      const safeEval = new Function("return " + evaluableEquation);
+
       // Evaluate and return result
       return safeEval();
     } catch (error) {
@@ -75,7 +75,7 @@ export class EquationParser {
         parameters: {},
         population: 1000,
         primary: {},
-        change: {}
+        change: {},
       };
 
       this.evaluate(equation, dummyContext);
@@ -99,4 +99,4 @@ export class EquationParser {
 
     return variables;
   }
-} 
+}

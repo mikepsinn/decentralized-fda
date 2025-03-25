@@ -18,6 +18,6 @@
     "rootDir": ".",
     "composite": true
   },
-  "include": ["src/**/*", "examples/**/*"],
+  "include": ["src/**/*", "examples/**/*", "data/**/*"],
   "exclude": ["node_modules", "dist"]
 }
