@@ -8,7 +8,7 @@ import {
   clinicalTrialCostData,
   TOTAL_CURRENT_COST,
   TOTAL_NEW_COST,
-} from "@/app/components/cost-savings-data"
+} from "@/components/cost-savings-data"
 
 import {CostItem} from "@/lib/health-econ-simulation/types";
 

@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Use pnpm for scripts and dependences 
+- run pnpm check regularly and fix error before proceeding
