@@ -9,6 +9,20 @@ import type { OAuthConfig } from "next-auth/providers/oauth"
 import { env } from "@/env.mjs"
 import { prisma as db } from "@/lib/db"
 
+// Add custom session type
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      username?: string | null
+      admin?: boolean
+    }
+  }
+}
+
 interface DFDAProfile {
   id: number | string
   displayName: string
@@ -159,8 +173,8 @@ export const authOptions: NextAuthOptions = {
           // 3. If user exists, check if we're signed in
           const session = await getServerSession(authOptions)
 
-          // If not signed in, prompt to sign in first
-          if (!session) {
+          // If not signed in or no user, prompt to sign in first
+          if (!session?.user) {
             return `/auth/error?error=SignInRequired&email=${user.email}`
           }
 
