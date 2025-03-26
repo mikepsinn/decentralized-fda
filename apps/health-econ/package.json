@@ -57,9 +57,9 @@
     "react-hook-form": "^7.50.1",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
+    "recharts": "^2.12.0",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
-    "recharts": "^2.12.0",
     "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",
     "vaul": "^0.9.0",
@@ -74,6 +74,8 @@
     "glob": "^11.0.1",
     "prisma": "^5.10.2",
     "ts-node": "^10.9.2",
+    "ts-prune": "^0.10.3",
+    "ts-unused-exports": "^11.0.1",
     "typescript": "^5.0.0"
   }
 }

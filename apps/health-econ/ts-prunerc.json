@@ -1,0 +1,28 @@
+{
+  "ignore": [
+    "default",
+    "metadata",
+    "viewport",
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "PATCH",
+    "HEAD",
+    "OPTIONS",
+    "runtime",
+    "alt",
+    "size",
+    "contentType"
+  ],
+  "ignoreDependencies": true,
+  "errorOnUnresolved": false,
+  "project": "./tsconfig.json",
+  "skip": [
+    "node_modules",
+    ".next",
+    "build",
+    "dist",
+    "public"
+  ]
+} 

@@ -1,0 +1,52 @@
+{
+  "directory": "./",
+  "excludePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/*.d.ts",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/app/**/page.tsx",
+    "**/app/**/layout.tsx",
+    "**/app/**/loading.tsx",
+    "**/app/**/error.tsx",
+    "**/app/**/not-found.tsx",
+    "**/app/api/**/*.ts",
+    "**/middleware.ts",
+    "**/next.config.js",
+    "**/next.config.mjs"
+  ],
+  "ignoreUnresolved": [
+    "@/*",
+    "@/components/*",
+    "@/lib/*",
+    "@/hooks/*",
+    "@/config/*",
+    "@/types/*"
+  ],
+  "ignorePatterns": [
+    "default",
+    "metadata",
+    "viewport",
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "PATCH",
+    "HEAD",
+    "OPTIONS",
+    "runtime",
+    "alt",
+    "size",
+    "contentType"
+  ],
+  "targets": [
+    "components/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "hooks/**/*.{ts,tsx}",
+    "config/**/*.{ts,tsx}",
+    "types/**/*.{ts,tsx}"
+  ]
+} 
